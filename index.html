@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kariyerim - Home</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <div class="hero-gradient" style="box-shadow: 0 8px 32px #00adb522;">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4" style="box-shadow: 0 2px 16px #00adb522 !important;">
+    <div class="container">
+      <a class="navbar-brand text-primary fw-bold" href="index.html">Kariyerim</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"><span></span></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="jobs.html">Jobs</a></li>
+          <li class="nav-item"><a class="nav-link" href="employer.html">Employer</a></li>
+          <li class="nav-item"><a class="nav-link" href="profile.html">Profile</a></li>
+        </ul>
+        <a href="#" class="navbar-auth-btn">Login</a>
+        <a href="#" class="navbar-auth-btn">Sign Up</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero/Search Section -->
+
+  <div class="container mb-5">
+    <div class="row justify-content-center align-items-center" style="min-height:280px;">
+      <div class="col-md-8 text-center">
+        <h1 class="mb-3">Find Your Next Job</h1>
+        <form class="row g-2" action="jobs.html" method="get">
+          <div class="col-md-5">
+            <input type="text" class="form-control" placeholder="Job title, keywords, or company" name="q">
+          </div>
+          <div class="col-md-5">
+            <input type="text" class="form-control" placeholder="City, state, or zip" name="l">
+          </div>
+          <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary fw-semibold">Search</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+    </div>
+<!-- Featured Jobs -->
+  <div class="container mb-5">
+    <h2 class="mb-4">Featured Jobs</h2>
+    <div class="row g-3" id="featured-jobs">
+      <!-- Featured job cards (sample mock data) -->
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">Frontend Developer</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Acme Corp - New York, NY</h6>
+            <p class="card-text">Develop and maintain web interfaces using React and Bootstrap in a fast-paced environment.</p>
+            <a href="job-details.html?id=1" class="card-link">View Details</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">Data Analyst</h5>
+            <h6 class="card-subtitle mb-2 text-muted">DataWiz - Remote</h6>
+            <p class="card-text">Analyze business data and build reports to support strategic decisions in a growing startup.</p>
+            <a href="job-details.html?id=2" class="card-link">View Details</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">Project Manager</h5>
+            <h6 class="card-subtitle mb-2 text-muted">GlobalTech - Austin, TX</h6>
+            <p class="card-text">Coordinate software projects and manage teams for major global clients.</p>
+            <a href="job-details.html?id=3" class="card-link">View Details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/auth-modal.js" type="module"></script>
+</body>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</html>
