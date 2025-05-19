@@ -7,6 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
@@ -22,8 +23,8 @@
           <li class="nav-item"><a class="nav-link" href="employer.html">Employer</a></li>
           <li class="nav-item"><a class="nav-link" href="profile.html">Profile</a></li>
         </ul>
-        <a href="#" class="navbar-auth-btn">Login</a>
-        <a href="#" class="navbar-auth-btn">Sign Up</a>
+        <a href="#" class="navbar-auth-btn" id="login-btn">Login</a>
+        <a href="#" class="navbar-auth-btn" id="signup-btn">Sign Up</a>
       </div>
     </div>
   </nav>
@@ -32,8 +33,8 @@
       <!-- Details loaded by JS -->
     </div>
   </div>
-  <script src="js/job-details.js" type="module"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/auth-modal.js" type="module"></script>
+  <script src="js/job-details.js"></script>
 </body>
 </html>
