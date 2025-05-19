@@ -60,36 +60,11 @@
 <!-- Featured Jobs -->
   <div class="container mb-5">
     <h2 class="mb-4">Featured Jobs</h2>
-    <div class="row g-3" id="featured-jobs">
-      <!-- Featured job cards (sample mock data) -->
-      <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Frontend Developer</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Acme Corp - New York, NY</h6>
-            <p class="card-text">Develop and maintain web interfaces using React and Bootstrap in a fast-paced environment.</p>
-            <a href="job-details.html?id=1" class="card-link">View Details</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Data Analyst</h5>
-            <h6 class="card-subtitle mb-2 text-muted">DataWiz - Remote</h6>
-            <p class="card-text">Analyze business data and build reports to support strategic decisions in a growing startup.</p>
-            <a href="job-details.html?id=2" class="card-link">View Details</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Project Manager</h5>
-            <h6 class="card-subtitle mb-2 text-muted">GlobalTech - Austin, TX</h6>
-            <p class="card-text">Coordinate software projects and manage teams for major global clients.</p>
-            <a href="job-details.html?id=3" class="card-link">View Details</a>
-          </div>
+    <div id="featured-jobs">
+      <!-- Jobs will be loaded dynamically from the API -->
+      <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
         </div>
       </div>
     </div>
@@ -98,6 +73,63 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/auth-modal.js" type="module"></script>
+
+  <!-- Featured Jobs Script -->
+  <script>
+    // Fetch featured jobs from API
+    document.addEventListener('DOMContentLoaded', function() {
+      const featuredJobsContainer = document.getElementById('featured-jobs');
+      
+      // Make API request to get jobs
+      axios.get('https://web-backend-7aux.onrender.com/api/v1/jobs')
+        .then(response => {
+          if (response.data && response.data.success) {
+            // Get jobs data (limit to 6 for featured section)
+            const jobs = response.data.data.slice(0, 6);
+            
+            let jobsHTML = '';
+            
+            // Create a single row for all jobs
+            jobsHTML += '<div class="row g-4">';
+            
+            // Add all jobs to the row
+            jobs.forEach(job => {
+              jobsHTML += `
+                <div class="col-md-4 mb-4">
+                  <div class="card h-100">
+                    <div class="card-body">
+                      <h5 class="card-title">${job.title}</h5>
+                      <h6 class="card-subtitle mb-2 text-muted">${job.companyName} - ${job.location}</h6>
+                      <p class="card-text">${job.description.substring(0, 100)}${job.description.length > 100 ? '...' : ''}</p>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <a href="job-details.html?id=${job._id}" class="card-link">View Details</a>
+                        <span class="badge job-type-badge">${job.jobType}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            });
+            
+            jobsHTML += '</div>';
+            
+            // Show a message if there are no jobs
+            if (jobs.length === 0) {
+              jobsHTML = '<div class="alert alert-info">No jobs available at the moment.</div>';
+            }
+            
+            // Update the container with job cards
+            featuredJobsContainer.innerHTML = jobsHTML;
+          } else {
+            featuredJobsContainer.innerHTML = '<div class="alert alert-warning">Failed to load featured jobs.</div>';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching featured jobs:', error);
+          featuredJobsContainer.innerHTML = '<div class="alert alert-danger">Error loading jobs. Please try again later.</div>';
+        });
+    });
+  </script>
 </body>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
