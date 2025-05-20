@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentEditJobId = null;
   
   // UI Elements
-  const jobFormContainer = document.getElementById('job-form-container');
+  const jobFormModal = document.getElementById('job-form-modal');
   const newJobBtn = document.getElementById('new-job-btn');
   const closeFormBtn = document.getElementById('close-form-btn');
   const myJobsContainer = document.getElementById('my-jobs-container');
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, duration);
   }
   
-  // Toggle job form visibility with smooth transitions
+  // Toggle job form modal visibility with smooth transitions
   if (newJobBtn) {
     newJobBtn.addEventListener('click', () => {
       // Reset edit mode when posting a new job
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       // Reset form title
-      const formTitle = document.querySelector('#job-form-container h2');
+      const formTitle = document.querySelector('.job-modal-content h2');
       if (formTitle) {
         formTitle.innerHTML = 'Post a Job';
       }
@@ -88,59 +88,61 @@ document.addEventListener('DOMContentLoaded', () => {
         formAlerts.innerHTML = '';
       }
       
-      // First make the form container visible but with opacity 0
-      jobFormContainer.style.display = 'block';
-      jobFormContainer.style.opacity = '0';
+      // Show the job form modal
+      jobFormModal.style.display = 'flex';
       
-      // After a tiny delay, trigger opacity transition
-      setTimeout(() => {
-        jobFormContainer.style.opacity = '1';
-      }, 10);
+      // Add event listener for closing modal by clicking outside
+      jobFormModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeJobFormModal();
+        }
+      });
       
-      // Scroll to the form
-      window.scrollTo({ top: jobFormContainer.offsetTop - 20, behavior: 'smooth' });
+      // Block scrolling on the body
+      document.body.style.overflow = 'hidden';
     });
   }
   
+  function closeJobFormModal() {
+    // Reset edit mode when closing the form
+    isEditMode = false;
+    currentEditJobId = null;
+    
+    // Hide the modal
+    jobFormModal.style.display = 'none';
+    
+    // Enable scrolling on body again
+    document.body.style.overflow = 'auto';
+    
+    // Reset form if it exists
+    const form = document.getElementById('post-job-form');
+    if (form) {
+      form.reset();
+      form.classList.remove('was-validated');
+    }
+    
+    // Reset form title
+    const formTitle = document.querySelector('.job-modal-content h2');
+    if (formTitle) {
+      formTitle.innerHTML = 'Post a Job';
+    }
+    
+    // Reset submit button text
+    const submitText = document.getElementById('submit-text');
+    if (submitText) {
+      submitText.innerText = 'Post Job';
+    }
+    
+    // Clear any existing alerts
+    const formAlerts = document.getElementById('form-alerts');
+    if (formAlerts) {
+      formAlerts.innerHTML = '';
+    }
+  }
+
   if (closeFormBtn) {
     closeFormBtn.addEventListener('click', () => {
-      // Start the opacity transition to fade out
-      jobFormContainer.style.opacity = '0';
-      
-      // Reset edit mode when closing the form
-      isEditMode = false;
-      currentEditJobId = null;
-      
-      // After transition completes, hide the form
-      setTimeout(() => {
-        jobFormContainer.style.display = 'none';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-        // Reset form if it exists
-        const form = document.getElementById('post-job-form');
-        if (form) {
-          form.reset();
-          form.classList.remove('was-validated');
-        }
-        
-        // Reset form title
-        const formTitle = document.querySelector('#job-form-container h2');
-        if (formTitle) {
-          formTitle.innerHTML = 'Post a Job';
-        }
-        
-        // Reset submit button text
-        const submitText = document.getElementById('submit-text');
-        if (submitText) {
-          submitText.innerText = 'Post Job';
-        }
-        
-        // Clear any existing alerts
-        const formAlerts = document.getElementById('form-alerts');
-        if (formAlerts) {
-          formAlerts.innerHTML = '';
-        }
-      }, 300);
+      closeJobFormModal();
     });
   }
   
@@ -299,17 +301,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Reset the form 
             form.reset();
             
-            // Set a timer to hide the alert and form
+            // Set a timer to hide the alert and close the modal
             setTimeout(() => {
-              // Fade out the form container
-              jobFormContainer.style.opacity = '0';
-              
-              // After transition completes, hide the form
-              setTimeout(() => {
-                jobFormContainer.style.display = 'none';
-                successDiv.remove();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }, 300);
+              // Close the modal
+              closeJobFormModal();
+              successDiv.remove();
             }, 3000);
             
             fetchEmployerJobs(); // Refresh jobs list
@@ -986,7 +982,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const job = response.data.data;
         
         // Update form title
-        const formTitle = document.querySelector('#job-form-container h2');
+        const formTitle = document.querySelector('.job-modal-content h2');
         if (formTitle) {
           formTitle.innerHTML = '<i class="bi bi-pencil-square me-2"></i> Edit Job Posting';
         }
@@ -1020,23 +1016,27 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('expiresAt').value = formattedDate;
         }
         
-        // Show the form
-        jobFormContainer.style.display = 'block';
-        jobFormContainer.style.opacity = '0';
+        // Show the modal
+        jobFormModal.style.display = 'flex';
         
-        // After a tiny delay, trigger opacity transition
-        setTimeout(() => {
-          jobFormContainer.style.opacity = '1';
-        }, 10);
+        // Add event listener for closing modal by clicking outside
+        jobFormModal.addEventListener('click', function(e) {
+          if (e.target === this) {
+            closeJobFormModal();
+          }
+        });
         
-        // Scroll to the form
-        window.scrollTo({ top: jobFormContainer.offsetTop - 20, behavior: 'smooth' });
+        // Block scrolling on the body
+        document.body.style.overflow = 'hidden';
         
         // Add a small animation highlight to the form to indicate it's in edit mode
-        jobFormContainer.classList.add('edit-mode-highlight');
-        setTimeout(() => {
-          jobFormContainer.classList.remove('edit-mode-highlight');
-        }, 1500);
+        const modalContent = document.querySelector('.auth-modal.job-form-modal');
+        if (modalContent) {
+          modalContent.classList.add('edit-mode-highlight');
+          setTimeout(() => {
+            modalContent.classList.remove('edit-mode-highlight');
+          }, 1500);
+        }
         
       } else {
         showToast('Error', 'Failed to load job details. Please try again.', 'danger');
@@ -1046,4 +1046,11 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('Error', 'Could not load job details: ' + (error.response?.data?.message || error.message), 'danger');
     }
   };
+  
+  // Setup event listener for ESC key to close the modal
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && jobFormModal.style.display === 'flex') {
+      closeJobFormModal();
+    }
+  });
 });

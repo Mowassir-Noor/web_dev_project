@@ -1,0 +1,90 @@
+/* Job Form Modal Specific Styles */
+.job-form-modal {
+  width: 800px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.job-modal-content {
+  padding: 1rem;
+}
+
+.job-modal-content h2 {
+  color: #00ADB5;
+  font-weight: 800;
+  margin-bottom: 1.3em;
+  letter-spacing: 0.5px;
+}
+
+/* Custom scrollbar for job form modal */
+.job-form-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.job-form-modal::-webkit-scrollbar-track {
+  background: #23272e;
+  border-radius: 10px;
+}
+
+.job-form-modal::-webkit-scrollbar-thumb {
+  background: #00ADB5;
+  border-radius: 10px;
+}
+
+.job-form-modal::-webkit-scrollbar-thumb:hover {
+  background: #009aa1;
+}
+
+/* Transition for modal */
+.edit-mode-highlight {
+  box-shadow: 0 0 0 4px #ffc107 !important;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+/* Form elements styling */
+.job-form-modal .form-label {
+  color: #EEEEEE;
+  font-weight: 500;
+}
+
+.job-form-modal .form-control,
+.job-form-modal .form-select {
+  background: #23272e !important;
+  color: #EEEEEE !important;
+  border: 1.5px solid #222831;
+  border-radius: 14px;
+  font-size: 1em;
+  padding: 0.6em 1em;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.job-form-modal .form-control:focus,
+.job-form-modal .form-select:focus {
+  border-color: #00ADB5;
+  box-shadow: 0 0 0 .13rem #00adb532;
+}
+
+/* Submit button styling */
+.job-form-modal .btn-primary {
+  border-radius: 16px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 12px #00adb533;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.job-form-modal .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px #00adb566;
+}
+
+/* Animation for modal entry/exit */
+@keyframes modalSlideIn {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.job-form-modal {
+  animation: modalSlideIn 0.25s ease-out;
+}
