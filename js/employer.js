@@ -496,6 +496,16 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Function to display employer jobs
   function displayEmployerJobs(jobs) {
+    // Store the current filter values before we clear the container
+    const currentSearchEl = document.getElementById('job-search');
+    const currentTypeEl = document.getElementById('job-type-filter');
+    const currentSortEl = document.getElementById('job-sort');
+    
+    // Save filter values to window object to restore them later
+    window.lastSearchValue = currentSearchEl ? currentSearchEl.value : '';
+    window.lastFilterValue = currentTypeEl ? currentTypeEl.value : 'all';
+    window.lastSortValue = currentSortEl ? currentSortEl.value : 'newest';
+    
     if (!jobs || jobs.length === 0) {
       myJobsContainer.innerHTML = `
         <div class="card border-0 shadow-sm p-4 text-center">
@@ -674,13 +684,37 @@ document.addEventListener('DOMContentLoaded', () => {
     html += `</div>`;
     
     myJobsContainer.innerHTML = html;
+    
+    // Set up filter and search listeners after the jobs are displayed
+    setupFilterListeners();
+    
+    // Restore filter values if they exist
+    if (window.lastSearchValue || window.lastFilterValue || window.lastSortValue) {
+      const searchInput = document.getElementById('job-search');
+      const typeFilter = document.getElementById('job-type-filter');
+      const sortSelect = document.getElementById('job-sort');
+      
+      if (searchInput) searchInput.value = window.lastSearchValue || '';
+      if (typeFilter) typeFilter.value = window.lastFilterValue || 'all';
+      if (sortSelect) sortSelect.value = window.lastSortValue || 'newest';
+      
+      console.log('Restoring filters:', {
+        search: window.lastSearchValue,
+        type: window.lastFilterValue,
+        sort: window.lastSortValue
+      });
+      
+      // Apply the filters with a small delay to ensure DOM is ready
+      setTimeout(() => filterJobs(), 100);
+    }
   }
   
   // Initialize by fetching employer jobs
   fetchEmployerJobs();
   
   // Add event listeners for search and filter functionality
-  document.addEventListener('DOMContentLoaded', function() {
+  // Using a function to set up listeners after jobs are displayed
+  function setupFilterListeners() {
     // Set up search functionality
     const searchInput = document.getElementById('job-search');
     if (searchInput) {
@@ -698,16 +732,31 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sortSelect) {
       sortSelect.addEventListener('change', filterJobs);
     }
-  });
+  }
   
   // Function to filter and sort jobs
   function filterJobs() {
+    console.log("Running filterJobs function");
     const searchInput = document.getElementById('job-search');
     const typeFilter = document.getElementById('job-type-filter');
     const sortSelect = document.getElementById('job-sort');
     
     // Get all job cards
     const jobCards = document.querySelectorAll('.job-card');
+    console.log(`Found ${jobCards.length} job cards total`);
+    
+    // Debug the first card's content
+    if (jobCards.length > 0) {
+      const firstCard = jobCards[0];
+      console.log('Sample card data:', {
+        id: firstCard.getAttribute('data-job-id'),
+        title: firstCard.querySelector('.card-title')?.textContent,
+        hasCardBody: !!firstCard.querySelector('.card-body'),
+        hasCardTitle: !!firstCard.querySelector('.card-title'),
+        hasDescription: !!firstCard.querySelector('.job-description p')
+      });
+    }
+    
     if (!jobCards.length) return;
     
     // Get filter values
@@ -724,24 +773,41 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Filter by search term
     if (searchTerm) {
+      console.log(`Filtering by search term: "${searchTerm}"`);
       filteredCards = filteredCards.filter(card => {
+        // Debug info to see what we're extracting
         const title = card.querySelector('.card-title')?.textContent?.toLowerCase() || '';
         const company = card.querySelector('.card-subtitle')?.textContent?.toLowerCase() || '';
         const location = card.querySelector('.bi-geo-alt')?.parentElement?.textContent?.toLowerCase() || '';
-        const description = card.querySelector('.job-description')?.textContent?.toLowerCase() || '';
-        return title.includes(searchTerm) || company.includes(searchTerm) || 
-               location.includes(searchTerm) || description.includes(searchTerm);
+        const description = card.querySelector('.job-description p')?.textContent?.toLowerCase() || '';
+        
+        const matches = title.includes(searchTerm) || 
+                        company.includes(searchTerm) || 
+                        location.includes(searchTerm) || 
+                        description.includes(searchTerm);
+        
+        return matches;
       });
+      console.log(`Found ${filteredCards.length} cards matching search term`);
     }
     
-    // Filter by job type
+    // Filter by job type - updated for the new card layout
     if (jobType !== 'all') {
       filteredCards = filteredCards.filter(card => {
+        // Get job type either from badge or data attribute
         const badge = card.querySelector('.badge');
-        if (!badge) return false;
+        if (badge) {
+          const type = badge.textContent.toLowerCase().replace(/\s/g, '-');
+          return type === jobType;
+        }
         
-        const type = badge.textContent.toLowerCase().replace(/\s/g, '-');
-        return type === jobType;
+        // Fallback to data attribute if badge is not found
+        const dataType = card.getAttribute('data-job-type');
+        if (dataType) {
+          return dataType.toLowerCase() === jobType;
+        }
+        
+        return false;
       });
     }
     
@@ -768,6 +834,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // If no cards are found
     if (filteredCards.length === 0) {
+      console.log("No cards match the filter criteria");
+      // Clear the container and show a message
       container.innerHTML = `
         <div class="col-12">
           <div class="alert alert-warning text-center py-4">
@@ -782,22 +850,63 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Hide all cards first
-    cols.forEach(col => {
-      col.style.display = 'none';
-    });
+    // Problem: when we filter, cards might be emptied or hidden incorrectly
+    // Solution: Instead of manipulating existing cards, let's rebuild the container completely
     
-    // Show only filtered cards
-    filteredCards.forEach(card => {
-      const parentCol = card.closest('.col-12');
-      if (parentCol) {
-        parentCol.style.display = 'block';
-      }
-    });
+    if (filteredCards.length > 0) {
+      console.log(`Showing ${filteredCards.length} filtered cards`);
+      
+      // First, preserve all the original cards and their parent columns
+      const originalCards = [];
+      jobCards.forEach(card => {
+        const jobId = card.getAttribute('data-job-id');
+        if (jobId) {
+          const parentCol = card.closest('.col-12');
+          if (parentCol) {
+            originalCards.push({
+              id: jobId,
+              card: card,
+              parent: parentCol,
+              html: parentCol.outerHTML
+            });
+          }
+        }
+      });
+      
+      // Clear the container
+      container.innerHTML = '';
+      
+      // Add back only the filtered cards
+      filteredCards.forEach(card => {
+        const jobId = card.getAttribute('data-job-id');
+        const original = originalCards.find(o => o.id === jobId);
+        if (original) {
+          // Add the original HTML back to the container
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = original.html;
+          const newCol = tempDiv.firstChild;
+          container.appendChild(newCol);
+        }
+      });
+      
+      console.log(`Container now has ${container.children.length} cards`);
+    } else {
+      // No cards matched filters
+      cols.forEach(col => {
+        col.style.display = 'none';
+      });
+    }
   }
   
   // Function to reset filters
   window.resetFilters = function() {
+    console.log("Resetting all filters");
+    
+    // Clear saved filter values
+    window.lastSearchValue = '';
+    window.lastFilterValue = 'all';
+    window.lastSortValue = 'newest';
+    
     const searchInput = document.getElementById('job-search');
     const typeFilter = document.getElementById('job-type-filter');
     const sortSelect = document.getElementById('job-sort');
@@ -810,7 +919,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const cols = document.querySelectorAll('.job-cards-container .col-12');
     cols.forEach(col => {
       col.style.display = 'block';
+      
+      // Ensure card content is visible
+      const card = col.querySelector('.job-card');
+      if (card) {
+        card.style.opacity = '1';
+        card.style.visibility = 'visible';
+      }
     });
+    
+    // Force page to reflow
+    document.querySelector('.job-cards-container').offsetHeight;
+    
+    console.log(`Reset complete, showing ${cols.length} cards`);
   }
   
   // Add deleteJob function to window for button click access
@@ -826,10 +947,10 @@ document.addEventListener('DOMContentLoaded', () => {
     jobElements.forEach(el => {
       // Apply deletion visual state
       el.classList.add('deleting');
-      const buttonContainer = el.querySelector('.d-flex.justify-content-end');
+      const buttonContainer = el.querySelector('.action-buttons-container');
       if (buttonContainer) {
         buttonContainer.innerHTML = `
-          <div class="d-flex align-items-center w-100 justify-content-center">
+          <div class="d-flex align-items-center justify-content-center p-3">
             <div class="spinner-border spinner-border-sm text-secondary me-2" role="status">
               <span class="visually-hidden">Deleting...</span>
             </div>
@@ -874,13 +995,14 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }, 3000);
         
-        fetchEmployerJobs(); // Refresh jobs list
+        fetchEmployerJobs(); // Refresh jobs list and filter will be set up after display
       } else {
         // Handle error in card view
         const jobElements = document.querySelectorAll(`.job-card[data-job-id="${jobId}"]`);
         jobElements.forEach(el => {
           // Card error handling with animation
           el.style.opacity = '1';
+          el.classList.remove('deleting');
           el.classList.add('border-danger');
           el.classList.add('shake-animation');
           
@@ -936,15 +1058,18 @@ document.addEventListener('DOMContentLoaded', () => {
           el.classList.remove('shake-animation');
         }, 2000);
         
-        // Restore buttons
-        const buttonContainer = el.querySelector('.d-flex.justify-content-center');
+        // Restore buttons - updated selector for the new horizontal card layout
+        const buttonContainer = el.querySelector('.action-buttons-container');
         if (buttonContainer) {
           buttonContainer.innerHTML = `
-            <a href="job-details.html?id=${jobId}" class="btn btn-outline-primary me-2">
-              <i class="bi bi-eye me-1"></i> <span class="d-none d-sm-inline">View</span>
+            <a href="job-details.html?id=${jobId}" class="btn btn-outline-primary">
+              <i class="bi bi-eye me-1"></i> <span>View Details</span>
             </a>
+            <button class="btn btn-outline-secondary" onclick="editJob('${jobId}')">
+              <i class="bi bi-pencil me-1"></i> <span>Edit Job</span>
+            </button>
             <button class="btn btn-outline-danger" onclick="deleteJob('${jobId}')">
-              <i class="bi bi-trash me-1"></i> <span class="d-none d-sm-inline">Delete</span>
+              <i class="bi bi-trash me-1"></i> <span>Delete Job</span>
             </button>
           `;
         }
