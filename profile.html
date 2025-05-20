@@ -5,7 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kariyerim - Profile</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Additional styles for the profile page */
+    .edit-skill-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5em 0.75em;
+      margin: 0.25em;
+      cursor: pointer;
+    }
+    
+    .edit-skill-badge:hover {
+      background-color: #f0f0f0;
+    }
+    
+    .edit-skill-badge[title]:hover:after {
+      content: attr(title);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0,0,0,0.8);
+      color: white;
+      padding: 0.25em 0.5em;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 1000;
+    }
+    
+    .btn-close-sm {
+      font-size: 0.65rem;
+      padding: 0.25rem;
+    }
+    
+    .education-entry {
+      border-left: 3px solid #00ADB5;
+      background-color: #f8f9fa;
+    }
+    
+    /* Improved modal styling */
+    .auth-modal {
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .form-label {
+      font-weight: 500;
+      color: #495057;
+    }
+  </style>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="js/logout-handler.js"></script>
 </head>
@@ -47,9 +98,35 @@
                 Experienced web developer with a focus on frontend and UI/UX. Proficient in React, JavaScript, and Bootstrap, passionate about building user-centric products.
               </p>
             </div>
+
+            <!-- Location information -->
+            <div class="user-location mb-3" style="display: none;">
+              <p class="text-muted">
+                <i class="bi bi-geo-alt"></i> <span id="user-location-text"></span>
+              </p>
+            </div>
+            
+            <!-- Education section -->
+            <div id="education-section" class="text-start mb-3" style="display: none;">
+              <h6 class="gradient-text mb-3">Education</h6>
+              <div id="education-list"></div>
+            </div>
+            
+            <!-- Experience section -->
+            <div id="experience-section" class="text-start mb-3" style="display: none;">
+              <h6 class="gradient-text mb-3">Experience</h6>
+              <div id="experience-list"></div>
+            </div>
+            
+            <!-- Skills section -->
+            <div id="skills-section" class="text-start mb-3" style="display: none;">
+              <h6 class="gradient-text mb-3">Skills</h6>
+              <div id="skills-list" class="d-flex flex-wrap gap-2"></div>
+            </div>
+            
             <div class="d-flex justify-content-center gap-3 mt-4 flex-wrap">
               <button class="btn btn-primary px-4 shadow-sm" id="edit-profile-btn"><i class="bi bi-pencil"></i> Edit Profile</button>
-              <button class="btn btn-outline-primary px-4 shadow-sm"><i class="bi bi-download"></i> Download CV</button>
+              <a href="#" class="btn btn-outline-primary px-4 shadow-sm" id="download-cv-btn" target="_blank"><i class="bi bi-download"></i> Download CV</a>
               <button type="button" class="btn btn-outline-primary px-4 shadow-sm" id="logout-btn"><i class="bi bi-box-arrow-right"></i> Logout</button>
             </div>
           </div>
@@ -81,21 +158,375 @@
 
   <!-- Edit Profile Modal -->
   <div class="auth-modal-backdrop" id="edit-profile-modal-backdrop" style="display:none;">
-    <div class="auth-modal" style="min-width:320px;max-width:95vw;">
+    <div class="auth-modal" style="min-width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;">
       <button class="auth-modal-close" id="edit-profile-modal-close" aria-label="Close">&times;</button>
-      <h3>Edit Profile</h3>
+      <h3 class="mb-3 gradient-text">Edit Profile</h3>
       <form id="edit-profile-form" autocomplete="off">
-        <input type="text" class="form-control" id="edit-name" placeholder="Full Name" required />
-        <input type="email" class="form-control" id="edit-email" placeholder="Email" required />
-        <textarea class="form-control" id="edit-summary" placeholder="Resume Summary" rows="3" required></textarea>
-        <button type="submit" class="btn btn-primary mt-2">Save Changes</button>
+        <div class="mb-3">
+          <label for="edit-name" class="form-label">Full Name</label>
+          <input type="text" class="form-control" id="edit-name" placeholder="Full Name" required />
+        </div>
+        
+        <div class="mb-3">
+          <label for="edit-email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="edit-email" placeholder="Email" readonly disabled />
+          <div class="form-text text-muted mt-1">
+            <i class="bi bi-info-circle"></i> Email cannot be edited
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="edit-location" class="form-label">Location</label>
+          <input type="text" class="form-control" id="edit-location" placeholder="City, Country" />
+        </div>
+        
+        <div class="mb-3">
+          <label for="edit-summary" class="form-label">Resume Summary</label>
+          <textarea class="form-control" id="edit-summary" placeholder="Resume Summary" rows="3"></textarea>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Skills</label>
+          <div id="edit-skills-container" class="d-flex flex-wrap gap-2 mb-2"></div>
+          <div class="input-group">
+            <input type="text" class="form-control" id="new-skill-input" placeholder="Enter a skill and click Add" />
+            <button class="btn btn-outline-secondary" type="button" id="add-skill-btn">Add</button>
+          </div>
+          <div class="form-text small text-muted mt-1">
+            <i class="bi bi-info-circle"></i> Type a skill name and click Add - press Enter to add quickly
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Education</label>
+          <div id="education-entries-container"></div>
+          <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-education-btn">
+            <i class="bi bi-plus"></i> Add Education
+          </button>
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Experience</label>
+          <div id="experience-entries-container"></div>
+          <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-experience-btn">
+            <i class="bi bi-plus"></i> Add Experience
+          </button>
+        </div>
+        
+        <button type="submit" class="btn btn-primary mt-3 w-100">Save Changes</button>
       </form>
     </div>
   </div>
+  
+  <!-- Education Entry Template (Hidden) -->
+  <template id="education-entry-template">
+    <div class="education-entry card mb-3 p-3">
+      <div class="d-flex justify-content-between mb-2">
+        <h6 class="mb-0">Education Entry</h6>
+        <button type="button" class="btn-close remove-education-btn" aria-label="Remove education entry"></button>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Institution</label>
+        <input type="text" class="form-control education-institution" placeholder="University/School Name" required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Degree</label>
+        <input type="text" class="form-control education-degree" placeholder="Bachelor's, Master's, etc." required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Field of Study</label>
+        <input type="text" class="form-control education-field" placeholder="Computer Science, Business, etc." />
+      </div>
+      <div class="row mb-2">
+        <div class="col">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-control education-start-date" />
+        </div>
+        <div class="col">
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-control education-end-date" />
+        </div>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Description</label>
+        <textarea class="form-control education-description" placeholder="Describe your education experience" rows="2"></textarea>
+      </div>
+    </div>
+  </template>
+  
+  <!-- Experience Entry Template (Hidden) -->
+  <template id="experience-entry-template">
+    <div class="experience-entry card mb-3 p-3">
+      <div class="d-flex justify-content-between mb-2">
+        <h6 class="mb-0">Experience Entry</h6>
+        <button type="button" class="btn-close remove-experience-btn" aria-label="Remove experience entry"></button>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Job Title</label>
+        <input type="text" class="form-control experience-title" placeholder="e.g. Software Engineer" required />
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Company</label>
+        <input type="text" class="form-control experience-company" placeholder="Company Name" required />
+      </div>
+      <div class="row mb-2">
+        <div class="col">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-control experience-start-date" required />
+        </div>
+        <div class="col">
+          <label class="form-label">End Date</label>
+          <input type="date" class="form-control experience-end-date" />
+        </div>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Description</label>
+        <textarea class="form-control experience-description" placeholder="Describe your work responsibilities and achievements" rows="2"></textarea>
+      </div>
+    </div>
+  </template>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/auth-modal.js" type="module"></script>
   <script>
+    // Profile data and API functions
+    let userData = null;
+    
+    // API helper function for making authenticated requests
+    async function apiRequest(url, method, data = null) {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+        
+        const options = {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        };
+        
+        if (data) {
+          options.body = JSON.stringify(data);
+        }
+        
+        const response = await fetch(url, options);
+        
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+        
+        if (response.status !== 204) { // No content
+          return await response.json();
+        }
+        
+        return { success: true };
+      } catch (error) {
+        console.error('API request error:', error);
+        return { error: error.message };
+      }
+    }
+    
+    // Education API functions
+    async function createEducation(educationData) {
+      return await apiRequest(
+        'https://web-backend-7aux.onrender.com/api/v1/users/education',
+        'POST',
+        educationData
+      );
+    }
+    
+    async function updateEducation(id, educationData) {
+      return await apiRequest(
+        `https://web-backend-7aux.onrender.com/api/v1/users/education/${id}`,
+        'PUT',
+        educationData
+      );
+    }
+    
+    async function deleteEducation(id) {
+      return await apiRequest(
+        `https://web-backend-7aux.onrender.com/api/v1/users/education/${id}`,
+        'DELETE'
+      );
+    }
+    
+    // Skills API functions
+    async function createSkill(skillData) {
+      return await apiRequest(
+        'https://web-backend-7aux.onrender.com/api/v1/users/skill',
+        'POST',
+        skillData
+      );
+    }
+    
+    async function updateSkill(id, skillData) {
+      // Instead of PUT request, create a new skill and delete the old one
+      try {
+        // First create the new skill
+        const createResponse = await createSkill(skillData);
+        
+        if (createResponse.error) {
+          return { error: `Failed to create new skill: ${createResponse.error}` };
+        }
+        
+        // Then delete the old one
+        const deleteResponse = await deleteSkill(id);
+        
+        if (deleteResponse.error) {
+          console.warn(`Created new skill but couldn't delete old one: ${deleteResponse.error}`);
+          // Even if we couldn't delete the old skill, we return the new skill data
+        }
+        
+        return createResponse;
+      } catch (error) {
+        console.error('Error in updateSkill:', error);
+        return { error: error.message };
+      }
+    }
+    
+    async function deleteSkill(id) {
+      return await apiRequest(
+        `https://web-backend-7aux.onrender.com/api/v1/users/skill/${id}`,
+        'DELETE'
+      );
+    }
+    
+    // Experience API functions
+    async function createExperience(experienceData) {
+      return await apiRequest(
+        'https://web-backend-7aux.onrender.com/api/v1/users/experience',
+        'POST',
+        experienceData
+      );
+    }
+    
+    async function updateExperience(id, experienceData) {
+      return await apiRequest(
+        `https://web-backend-7aux.onrender.com/api/v1/users/experience/${id}`,
+        'PUT',
+        experienceData
+      );
+    }
+    
+    async function deleteExperience(id) {
+      return await apiRequest(
+        `https://web-backend-7aux.onrender.com/api/v1/users/experience/${id}`,
+        'DELETE'
+      );
+    }
+    
+    // Profile API functions
+    async function updateProfile(profileData) {
+      return await apiRequest(
+        'https://web-backend-7aux.onrender.com/api/v1/users/profile',
+        'PUT',
+        profileData
+      );
+    }
+    
+    // Function to fetch user profile data from the API
+    async function fetchUserProfile() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('No token found');
+          return;
+        }
+        
+        // Fetch basic profile info
+        const profileResponse = await fetch('https://web-backend-7aux.onrender.com/api/v1/users/profile/info', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!profileResponse.ok) {
+          throw new Error('Failed to fetch profile data');
+        }
+        
+        userData = await profileResponse.json();
+        
+        // Also fetch experience data
+        try {
+          const experienceResponse = await fetch('https://web-backend-7aux.onrender.com/api/v1/users/experience/info', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (experienceResponse.ok) {
+            const experienceData = await experienceResponse.json();
+            // Add experience data to userData
+            if (experienceData.success && experienceData.data) {
+              userData.experience = experienceData.data;
+            }
+          }
+        } catch (expError) {
+          console.warn('Error fetching experience data:', expError);
+        }
+        
+        displayUserProfile(userData);
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+      }
+    }
+    
+    // Function to display the user profile data
+    function displayUserProfile(data) {
+      if (!data) return;
+      
+      // Update basic profile information
+      const nameEl = document.querySelector(".profile-name");
+      const emailEl = document.querySelector(".profile-email");
+      const summaryEl = document.querySelector(".profile-summary");
+      const avatarImg = document.querySelector(".profile-avatar-img");
+      
+      nameEl.textContent = data.name || 'User';
+      emailEl.innerHTML = `<i class="bi bi-envelope"></i> ${data.email || ''}`;
+      
+      // Update bio/summary if available
+      if (data.bio) {
+        summaryEl.textContent = data.bio;
+      }
+      
+      // Update avatar with user's name
+      avatarImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=00ADB5&color=222831&size=128`;
+      
+      // Update location if available
+      if (data.location) {
+        const locationSection = document.querySelector(".user-location");
+        document.getElementById("user-location-text").textContent = data.location;
+        locationSection.style.display = "block";
+      }
+      
+      // Update resume download link if available
+      if (data.resumeUrl) {
+        const downloadBtn = document.getElementById("download-cv-btn");
+        downloadBtn.href = data.resumeUrl;
+      }
+      
+      // Display education information
+      if (data.education && data.education.length > 0) {
+        // Use the central function to display education to avoid duplication
+        updateEducationDisplay(data.education);
+      }
+      
+      // Display experience information
+      if (data.experience && data.experience.length > 0) {
+        // Use a central function to display experience
+        updateExperienceDisplay(data.experience);
+      }
+      
+      // Display skills information
+      if (data.skills && data.skills.length > 0) {
+        // Using the centralized function to display skills to avoid duplication
+        updateSkillsDisplay(data.skills);
+      }
+    }
+    
     // Profile modal logic
     const editBtn = document.getElementById("edit-profile-btn");
     const modalBackdrop = document.getElementById("edit-profile-modal-backdrop");
@@ -104,12 +535,72 @@
     const nameEl = document.querySelector(".profile-name");
     const emailEl = document.querySelector(".profile-email");
     const summaryEl = document.querySelector(".profile-summary");
-    const avatarImg = document.querySelector(".profile-avatar-img");
+    const avatarImg = document.querySelector(".profile-avatar-img");      // Add Enter key handler for adding skills
+    document.getElementById('new-skill-input')?.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('add-skill-btn').click();
+      }
+    });
+    
+    // Show loading indicators and status messages
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed top-0 end-0 m-3`;
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'assertive');
+      toast.setAttribute('aria-atomic', 'true');
+      
+      // Choose icon based on type
+      let icon = 'check-circle';
+      if (type === 'danger') {
+        icon = 'exclamation-circle';
+      } else if (type === 'warning') {
+        icon = 'exclamation-triangle';
+      } else if (type === 'info') {
+        icon = 'info-circle';
+      }
+      
+      toast.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="bi bi-${icon} me-2"></i> ${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      `;
+      
+      document.body.appendChild(toast);
+      
+      // Show the toast
+      const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+      bsToast.show();
+      
+      // Remove the toast after it's hidden
+      toast.addEventListener('hidden.bs.toast', function() {
+        toast.remove();
+      });
+    }
 
     editBtn.onclick = function() {
       document.getElementById("edit-name").value = nameEl.textContent.trim();
-      document.getElementById("edit-email").value = emailEl.textContent.replace(/^[^@]+/, '').trim() ? emailEl.textContent.replace(/^[^@]+/, '').trim() : emailEl.textContent.trim();
+      document.getElementById("edit-email").value = userData ? userData.email : (emailEl.textContent.replace(/^[^\s@]+@/, '').trim() ? emailEl.textContent.replace(/^.*?(\s+|)/, '').trim() : emailEl.textContent.trim());
       document.getElementById("edit-summary").value = summaryEl.textContent.trim();
+      
+      // Add location to edit form if available
+      if (userData && userData.location) {
+        document.getElementById("edit-location").value = userData.location;
+      }
+      
+      // Populate skills
+      populateSkillsEditForm();
+      
+      // Populate education entries
+      populateEducationEditForm();
+      
+      // Populate experience entries
+      populateExperienceEditForm();
+      
       modalBackdrop.style.display = "flex";
       setTimeout(() => {
         document.getElementById("edit-name").focus();
@@ -124,15 +615,101 @@
       if (e.target === modalBackdrop) modalBackdrop.style.display = "none";
     };
 
-    editForm.onsubmit = function(e) {
+    editForm.onsubmit = async function(e) {
       e.preventDefault();
+      
+      // Show loading state
+      const submitBtn = editForm.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+      
       const newName = document.getElementById("edit-name").value;
       const newEmail = document.getElementById("edit-email").value;
-      nameEl.textContent = newName;
-      emailEl.innerHTML = `<i class="bi bi-envelope"></i> ` + newEmail;
-      summaryEl.textContent = document.getElementById("edit-summary").value;
-      avatarImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=00ADB5&color=222831&size=128`;
-      modalBackdrop.style.display = "none";
+      const newSummary = document.getElementById("edit-summary").value;
+      const newLocation = document.getElementById("edit-location").value;
+      
+      try {
+        // Update profile information first - only name, bio and location are editable
+        const profileResult = await updateProfile({
+          name: newName,
+          bio: newSummary,
+          location: newLocation
+        });
+        
+        if (profileResult.error) {
+          throw new Error(`Failed to update profile: ${profileResult.error}`);
+        }
+        
+        // Update basic profile display
+        nameEl.textContent = newName;
+        emailEl.innerHTML = `<i class="bi bi-envelope"></i> ` + newEmail;
+        summaryEl.textContent = newSummary;
+        
+        // Update location display
+        if (newLocation) {
+          const locationSection = document.querySelector(".user-location");
+          document.getElementById("user-location-text").textContent = newLocation;
+          locationSection.style.display = "block";
+        }
+        
+        // Update avatar
+        avatarImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=00ADB5&color=222831&size=128`;
+        
+        // Collect education entries from the form
+        const educationEntries = collectEducationEntries();
+        
+        // Save education entries
+        const educationResult = await saveEducationEntries(educationEntries);
+        if (!educationResult.success) {
+          console.warn('Some education entries failed to save');
+        }
+        
+        // Store the updated values in userData
+        if (userData) {
+          userData.name = newName;
+          userData.email = newEmail;
+          userData.bio = newSummary;
+          userData.location = newLocation;
+          
+          // Update the UI to reflect changes
+          updateEducationDisplay(educationResult.entries.length > 0 ? educationResult.entries : educationEntries);
+          
+          // Collect experience entries from the form
+          const experienceEntries = collectExperienceEntries();
+          
+          // Save experience entries
+          const experienceResult = await saveExperienceEntries(experienceEntries);
+          if (!experienceResult.success) {
+            console.warn('Some experience entries failed to save');
+          }
+          
+          // Update the UI to reflect experience changes
+          if (experienceResult.entries.length > 0) {
+            userData.experience = experienceResult.entries;
+            updateExperienceDisplay(experienceResult.entries);
+          } else if (experienceEntries.length > 0) {
+            updateExperienceDisplay(experienceEntries);
+          }
+        }
+        
+        // Skills are handled individually during add/remove operations
+        
+        modalBackdrop.style.display = "none";
+        
+        // Show success message
+        showToast('Profile updated successfully!');
+        
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        
+        // Error feedback
+        alert(`Failed to update profile: ${error.message}`);
+      } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+      }
     };
 
     // Show/hide login/signup buttons based on auth state
@@ -144,6 +721,9 @@
       if (token) {
         if (loginBtn) loginBtn.style.display = 'none';
         if (signupBtn) signupBtn.style.display = 'none';
+        
+        // If token exists, fetch user profile data
+        fetchUserProfile();
       } else {
         if (loginBtn) loginBtn.style.display = '';
         if (signupBtn) signupBtn.style.display = '';
@@ -155,6 +735,770 @@
     
     // Run it immediately too (in case DOM is already loaded)
     updateAuthButtons();
+
+    // Skills management functions
+    function populateSkillsEditForm() {
+      const skillsContainer = document.getElementById('edit-skills-container');
+      skillsContainer.innerHTML = '';
+      
+      // Add a hint about double-click editing
+      const hint = document.createElement('p');
+      hint.className = 'text-muted small mb-2';
+      hint.innerHTML = '<i class="bi bi-info-circle"></i> Double-click on a skill to edit it';
+      skillsContainer.parentNode.insertBefore(hint, skillsContainer);
+      
+      if (userData && userData.skills && userData.skills.length > 0) {
+        userData.skills.forEach(skill => {
+          if (skill.name) {
+            addSkillBadgeToForm(skill.name, skill._id);
+          }
+        });
+      }
+      
+      // Set up the add skill button event listener
+      document.getElementById('add-skill-btn').onclick = function() {
+        addNewSkill();
+      };
+    }
+    
+    // Function to update the skills display in the profile view (non-edit mode)
+    function updateSkillsDisplay(skills) {
+      if (!skills || !skills.length) return;
+      
+      const skillsList = document.getElementById("skills-list");
+      const skillsSection = document.getElementById("skills-section");
+      
+      // Clear the existing skills to avoid duplication
+      skillsList.innerHTML = '';
+      
+      // Make the section visible
+      skillsSection.style.display = "block";
+      
+      // Add each skill as a badge
+      skills.forEach(skill => {
+        if (skill && skill.name) {
+          const skillBadge = document.createElement("span");
+          skillBadge.className = "badge bg-light text-dark border";
+          skillBadge.textContent = skill.name;
+          skillsList.appendChild(skillBadge);
+        }
+      });
+    }
+    
+    // Function to rename a skill using the create-delete pattern
+    function renameSkill(oldSkillId, newSkillName) {
+      return new Promise((resolve, reject) => {
+        if (!oldSkillId || !newSkillName) {
+          resolve({ success: false, message: 'Missing skill ID or new name' });
+          return;
+        }
+        
+        // Create a new skill with the updated name
+        createSkill({ name: newSkillName })
+          .then(createResponse => {
+            if (createResponse.error) {
+              resolve({ success: false, message: `Failed to create new skill: ${createResponse.error}` });
+              return;
+            }
+            
+            // Successfully created new skill, now delete the old one
+            const newSkill = createResponse;
+            
+            // Delete the old skill
+            deleteSkill(oldSkillId)
+              .then(deleteResponse => {
+                if (deleteResponse.error) {
+                  console.warn(`Created new skill but couldn't delete old one: ${deleteResponse.error}`);
+                }
+                
+                // Update the userData
+                if (userData && userData.skills) {
+                  // Remove the old skill
+                  userData.skills = userData.skills.filter(s => s._id !== oldSkillId);
+                  // Add the new skill
+                  userData.skills.push(newSkill);
+                  
+                  // Update the skills display
+                  updateSkillsDisplay(userData.skills);
+                }
+                
+                resolve({ 
+                  success: true, 
+                  message: 'Skill renamed successfully', 
+                  newSkill: newSkill 
+                });
+              })
+              .catch(error => {
+                console.error('Error deleting old skill:', error);
+                resolve({ 
+                  success: true, 
+                  message: 'Created new skill but failed to delete old one', 
+                  newSkill: newSkill 
+                });
+              });
+          })
+          .catch(error => {
+            console.error('Error creating new skill:', error);
+            resolve({ success: false, message: `Error: ${error.message}` });
+          });
+      });
+    }
+    
+    // Simple version of addNewSkill that avoids any potential issues with async/await
+    function addNewSkill() {
+      const skillInput = document.getElementById('new-skill-input');
+      const skillName = skillInput.value.trim();
+      
+      if (!skillName) return;
+      
+      const addBtn = document.getElementById('add-skill-btn');
+      const originalBtnText = addBtn.innerHTML || 'Add';
+      
+      // Disable the button and show loading state
+      addBtn.disabled = true;
+      addBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+      
+      // Check if skill with the same name already exists
+      const existingSkill = userData?.skills?.find(s => s.name.toLowerCase() === skillName.toLowerCase());
+      
+      if (existingSkill) {
+        // Reset loading state
+        addBtn.disabled = false;
+        addBtn.innerHTML = originalBtnText;
+        
+        // Show warning and don't create a duplicate
+        showToast(`Skill "${skillName}" already exists`, 'warning');
+        return;
+      }
+      
+      // Define a function to ensure button state is reset
+      const resetButtonState = () => {
+        if (addBtn) {
+          addBtn.disabled = false;
+          addBtn.innerHTML = originalBtnText;
+        }
+      };
+      
+      try {
+        // Create the skill in the backend
+        createSkill({ name: skillName })
+          .then(response => {
+            // Always reset button state first
+            resetButtonState();
+            
+            if (!response.error) {
+              // Add to UI with the ID from the response
+              addSkillBadgeToForm(skillName, response._id);
+              
+              // Clear input field after successful addition
+              skillInput.value = '';
+              
+              // Show success message
+              showToast(`Skill "${skillName}" added successfully`);
+              
+              // Update userData
+              if (userData) {
+                if (!userData.skills) userData.skills = [];
+                userData.skills.push(response);
+                
+                // Update the UI display
+                updateSkillsDisplay(userData.skills);
+              }
+              
+              // Focus the input field for next skill entry
+              skillInput.focus();
+            } else {
+              showToast(`Failed to add skill: ${response.error}`, 'danger');
+            }
+          })
+          .catch(error => {
+            // Reset button state on error
+            resetButtonState();
+            showToast(`Error adding skill: ${error.message}`, 'danger');
+          });
+      } catch (error) {
+        // Safety net - ensure button is reset if something unexpected happens
+        resetButtonState();
+        showToast(`Unexpected error: ${error.message}`, 'danger');
+      }
+    }
+    
+    function addSkillBadgeToForm(skillName, skillId = null) {
+      const skillsContainer = document.getElementById('edit-skills-container');
+      
+      // Create a new skill badge
+      const badge = document.createElement('span');
+      badge.className = 'badge bg-light text-dark border edit-skill-badge';
+      badge.setAttribute('data-skill-name', skillName);
+      if (skillId) {
+        badge.setAttribute('data-skill-id', skillId);
+      }
+      
+      // Add skill name and remove button
+      badge.innerHTML = `${skillName} <button type="button" class="btn-close btn-close-sm ms-1" aria-label="Remove skill"></button>`;
+      
+      // Add double-click handler to edit the skill
+      badge.addEventListener('dblclick', function() {
+        const oldSkillId = badge.getAttribute('data-skill-id');
+        const oldSkillName = badge.getAttribute('data-skill-name');
+        
+        // If this skill has an ID (exists in backend)
+        if (oldSkillId) {
+          // Create an input to replace the badge content temporarily
+          const originalContent = badge.innerHTML;
+          
+          // Hide the badge text and show an input
+          badge.innerHTML = '';
+          badge.classList.add('p-0', 'overflow-hidden');
+          
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.className = 'form-control form-control-sm border-0';
+          input.value = oldSkillName;
+          input.style.width = '100px';
+          input.style.height = '100%';
+          
+          badge.appendChild(input);
+          input.focus();
+          input.select();
+          
+          // Handle input blur or Enter key
+          function handleEdit(saveChanges) {
+            const newSkillName = input.value.trim();
+            
+            // Restore badge appearance
+            badge.classList.remove('p-0', 'overflow-hidden');
+            
+            if (saveChanges && newSkillName && newSkillName !== oldSkillName) {
+              // Show loading state
+              badge.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+              badge.classList.add('opacity-50');
+              
+              // Update the skill using create-delete pattern
+              renameSkill(oldSkillId, newSkillName)
+                .then(result => {
+                  if (result.success) {
+                    // Update badge with new name and ID
+                    badge.setAttribute('data-skill-name', newSkillName);
+                    badge.setAttribute('data-skill-id', result.newSkill._id);
+                    badge.innerHTML = `${newSkillName} <button type="button" class="btn-close btn-close-sm ms-1" aria-label="Remove skill"></button>`;
+                    
+                    // Re-attach the remove handler to the new button
+                    attachRemoveHandler(badge.querySelector('.btn-close'), badge);
+                    
+                    showToast(result.message);
+                  } else {
+                    // Restore original content on failure
+                    badge.innerHTML = originalContent;
+                    showToast(result.message, 'danger');
+                    
+                    // Re-attach the remove handler to the restored button
+                    attachRemoveHandler(badge.querySelector('.btn-close'), badge);
+                  }
+                  
+                  badge.classList.remove('opacity-50');
+                });
+            } else {
+              // No change or empty value, restore original
+              badge.innerHTML = originalContent;
+              
+              // Re-attach the remove handler to the restored button
+              attachRemoveHandler(badge.querySelector('.btn-close'), badge);
+            }
+          }
+          
+          // Handle Enter key and Escape key
+          input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleEdit(true); // Save changes
+            } else if (e.key === 'Escape') {
+              handleEdit(false); // Cancel changes
+            }
+          });
+          
+          // Handle click outside
+          input.addEventListener('blur', function() {
+            handleEdit(true); // Save changes on blur
+          });
+        }
+      });
+      
+      // Attach remove handler
+      attachRemoveHandler(badge.querySelector('.btn-close'), badge);
+      
+      skillsContainer.appendChild(badge);
+    }
+    
+    // Helper function to attach remove handler to skill badge
+    function attachRemoveHandler(closeButton, badge) {
+      closeButton.onclick = function() {
+        const skillId = badge.getAttribute('data-skill-id');
+        const skillName = badge.getAttribute('data-skill-name');
+        
+        // If this skill exists in the backend, delete it
+        if (skillId) {
+          // Add loading state to badge
+          const originalContent = badge.innerHTML;
+          badge.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+          badge.classList.add('opacity-50');
+          
+          deleteSkill(skillId).then(response => {
+            if (!response.error) {
+              badge.remove();
+              showToast(`Skill removed successfully`);
+              
+              // Also update the skill list in userData if it exists
+              if (userData && userData.skills) {
+                userData.skills = userData.skills.filter(s => s._id !== skillId);
+                
+                // Update the UI display
+                updateSkillsDisplay(userData.skills);
+              }
+            } else {
+              // Restore original state on failure
+              badge.innerHTML = originalContent;
+              badge.classList.remove('opacity-50');
+              showToast(`Failed to delete skill: ${response.error}`, 'danger');
+              
+              // Re-attach the remove handler to the restored button
+              attachRemoveHandler(badge.querySelector('.btn-close'), badge);
+            }
+          }).catch(error => {
+            // Restore original state on error
+            badge.innerHTML = originalContent;
+            badge.classList.remove('opacity-50');
+            showToast(`Error deleting skill: ${error.message}`, 'danger');
+            
+            // Re-attach the remove handler to the restored button
+            attachRemoveHandler(badge.querySelector('.btn-close'), badge);
+          });
+        } else {
+          // Simply remove from DOM if it's a new skill
+          badge.remove();
+        }
+      };
+    }
+    
+    function populateEducationEditForm() {
+      const container = document.getElementById('education-entries-container');
+      container.innerHTML = '';
+      
+      if (userData && userData.education && userData.education.length > 0) {
+        // Filter out education entries that have actual data
+        const validEntries = userData.education.filter(edu => edu.institution);
+        
+        validEntries.forEach(edu => {
+          addEducationEntryToForm(edu);
+        });
+      }
+      
+      // Set up add education button
+      document.getElementById('add-education-btn').onclick = function() {
+        // Simply add an empty form to be filled in (will be saved when form is submitted)
+        addEducationEntryToForm();
+      };
+    }
+    
+    function addEducationEntryToForm(educationData = {}) {
+      const container = document.getElementById('education-entries-container');
+      const template = document.getElementById('education-entry-template');
+      const clone = document.importNode(template.content, true);
+      const entryDiv = clone.querySelector('.education-entry');
+      
+      // Store the ID if it exists (for API updates)
+      if (educationData._id) {
+        entryDiv.setAttribute('data-id', educationData._id);
+      }
+      
+      // Fill in values if provided
+      if (educationData.institution) {
+        clone.querySelector('.education-institution').value = educationData.institution;
+      }
+      if (educationData.degree) {
+        clone.querySelector('.education-degree').value = educationData.degree;
+      }
+      if (educationData.fieldOfStudy) {
+        clone.querySelector('.education-field').value = educationData.fieldOfStudy;
+      }
+      if (educationData.startDate) {
+        // Convert to YYYY-MM-DD format for date input
+        const startDate = new Date(educationData.startDate);
+        clone.querySelector('.education-start-date').value = startDate.toISOString().split('T')[0];
+      }
+      if (educationData.endDate) {
+        // Convert to YYYY-MM-DD format for date input
+        const endDate = new Date(educationData.endDate);
+        clone.querySelector('.education-end-date').value = endDate.toISOString().split('T')[0];
+      }
+      if (educationData.description) {
+        clone.querySelector('.education-description').value = educationData.description;
+      }
+      
+      // Set up remove button
+      clone.querySelector('.remove-education-btn').onclick = function(e) {
+        const entry = e.target.closest('.education-entry');
+        const entryId = entry.getAttribute('data-id');
+        
+        // If this education entry exists in the backend, confirm deletion
+        if (entryId) {
+          if (confirm('Are you sure you want to delete this education entry?')) {
+            // Add loading state
+            const removeBtn = entry.querySelector('.remove-education-btn');
+            const originalBtn = removeBtn.cloneNode(true);
+            removeBtn.disabled = true;
+            removeBtn.classList.add('pe-none'); // Prevent pointer events
+            
+            // Add spinner next to button
+            const spinner = document.createElement('span');
+            spinner.className = 'spinner-border spinner-border-sm ms-2';
+            spinner.setAttribute('role', 'status');
+            spinner.setAttribute('aria-hidden', 'true');
+            entry.querySelector('.d-flex').appendChild(spinner);
+            
+            // Delete from API if it has an ID
+            deleteEducation(entryId).then(response => {
+              if (!response.error) {
+                entry.remove();
+                showToast('Education entry deleted successfully');
+              } else {
+                // Restore original button
+                removeBtn.disabled = false;
+                removeBtn.classList.remove('pe-none');
+                spinner.remove();
+                showToast(`Failed to delete education entry: ${response.error}`, 'danger');
+              }
+            }).catch(error => {
+              // Restore original button
+              removeBtn.disabled = false;
+              removeBtn.classList.remove('pe-none');
+              spinner.remove();
+              showToast(`Error deleting education entry: ${error.message}`, 'danger');
+            });
+          }
+        } else {
+          // Simply remove from DOM if it's a new entry
+          entry.remove();
+        }
+      };
+      
+      container.appendChild(clone);
+    }
+    
+    function collectEducationEntries() {
+      const entries = [];
+      const entryElements = document.querySelectorAll('.education-entry');
+      
+      entryElements.forEach(entry => {
+        const institution = entry.querySelector('.education-institution').value.trim();
+        const degree = entry.querySelector('.education-degree').value.trim();
+        const fieldOfStudy = entry.querySelector('.education-field').value.trim();
+        const startDate = entry.querySelector('.education-start-date').value;
+        const endDate = entry.querySelector('.education-end-date').value;
+        const description = entry.querySelector('.education-description').value.trim();
+        
+        // Only add if at least institution and degree are provided
+        if (institution && degree) {
+          // Keep existing ID if it was in the original data
+          const existingId = entry.getAttribute('data-id');
+          
+          entries.push({
+            _id: existingId || undefined,
+            institution,
+            degree,
+            fieldOfStudy,
+            startDate: startDate ? new Date(startDate).toISOString() : null,
+            endDate: endDate ? new Date(endDate).toISOString() : null,
+            description,
+          });
+        }
+      });
+      
+      return entries;
+    }
+    
+    // Function to save education entries to the backend
+    async function saveEducationEntries(entries) {
+      let allSuccess = true;
+      const updatedEntries = [];
+      
+      // Process each education entry
+      for (const entry of entries) {
+        let response;
+        
+        if (entry._id) {
+          // Update existing education entry
+          response = await updateEducation(entry._id, entry);
+        } else {
+          // Create new education entry
+          response = await createEducation(entry);
+        }
+        
+        if (response.error) {
+          console.error('Failed to save education entry:', response.error);
+          allSuccess = false;
+        } else {
+          updatedEntries.push(response);
+        }
+      }
+      
+      return {
+        success: allSuccess,
+        entries: updatedEntries
+      };
+    }
+    
+    function updateEducationDisplay(education) {
+      const educationList = document.getElementById('education-list');
+      const educationSection = document.getElementById('education-section');
+      
+      // Clear existing education entries
+      educationList.innerHTML = '';
+      
+      // Filter out education entries without institution info
+      const validEducation = education.filter(edu => edu.institution);
+      
+      if (validEducation.length > 0) {
+        educationSection.style.display = 'block';
+        
+        validEducation.forEach(edu => {
+          const educationCard = document.createElement('div');
+          educationCard.className = 'mb-3';
+          
+          const dateRange = edu.startDate && edu.endDate ? 
+            `${new Date(edu.startDate).getFullYear()} - ${new Date(edu.endDate).getFullYear()}` : 
+            '';
+          
+          educationCard.innerHTML = `
+            <div class="mb-1">
+              <strong>${edu.institution}</strong>
+              ${dateRange ? `<span class="text-muted ms-2">${dateRange}</span>` : ''}
+            </div>
+            <div class="mb-1">${edu.degree}${edu.fieldOfStudy ? ` in ${edu.fieldOfStudy}` : ''}</div>
+            ${edu.description ? `<p class="text-muted small mb-0">${edu.description}</p>` : ''}
+          `;
+          
+          educationList.appendChild(educationCard);
+        });
+      } else {
+        educationSection.style.display = 'none';
+      }
+    }
+    
+    // Experience management functions
+    function populateExperienceEditForm() {
+      const container = document.getElementById('experience-entries-container');
+      container.innerHTML = '';
+      
+      if (userData && userData.experience && userData.experience.length > 0) {
+        // Filter out experience entries that have actual data
+        const validEntries = userData.experience.filter(exp => exp.title && exp.company);
+        
+        validEntries.forEach(exp => {
+          addExperienceEntryToForm(exp);
+        });
+      }
+      
+      // Set up add experience button
+      document.getElementById('add-experience-btn').onclick = function() {
+        // Simply add an empty form to be filled in (will be saved when form is submitted)
+        addExperienceEntryToForm();
+      };
+    }
+    
+    function addExperienceEntryToForm(experienceData = {}) {
+      const container = document.getElementById('experience-entries-container');
+      const template = document.getElementById('experience-entry-template');
+      const clone = document.importNode(template.content, true);
+      const entryDiv = clone.querySelector('.experience-entry');
+      
+      // Store the ID if it exists (for API updates)
+      if (experienceData._id) {
+        entryDiv.setAttribute('data-id', experienceData._id);
+      }
+      
+      // Fill in values if provided
+      if (experienceData.title) {
+        clone.querySelector('.experience-title').value = experienceData.title;
+      }
+      if (experienceData.company) {
+        clone.querySelector('.experience-company').value = experienceData.company;
+      }
+      if (experienceData.startDate) {
+        // Convert to YYYY-MM-DD format for date input
+        const startDate = new Date(experienceData.startDate);
+        clone.querySelector('.experience-start-date').value = startDate.toISOString().split('T')[0];
+      }
+      if (experienceData.endDate) {
+        // Convert to YYYY-MM-DD format for date input
+        const endDate = new Date(experienceData.endDate);
+        clone.querySelector('.experience-end-date').value = endDate.toISOString().split('T')[0];
+      }
+      if (experienceData.description) {
+        clone.querySelector('.experience-description').value = experienceData.description;
+      }
+      
+      // Set up remove button
+      clone.querySelector('.remove-experience-btn').onclick = function(e) {
+        const entry = e.target.closest('.experience-entry');
+        const entryId = entry.getAttribute('data-id');
+        
+        // If this experience entry exists in the backend, confirm deletion
+        if (entryId) {
+          if (confirm('Are you sure you want to delete this experience entry?')) {
+            // Show loading state
+            entry.classList.add('opacity-50');
+            entry.style.pointerEvents = 'none';
+            
+            deleteExperience(entryId).then(response => {
+              if (!response.error) {
+                entry.remove();
+                showToast('Experience entry deleted successfully');
+                
+                // Also update userData if it exists
+                if (userData && userData.experience) {
+                  userData.experience = userData.experience.filter(exp => exp._id !== entryId);
+                  
+                  // Update the display
+                  updateExperienceDisplay(userData.experience);
+                }
+              } else {
+                // Restore the entry on failure
+                entry.classList.remove('opacity-50');
+                entry.style.pointerEvents = '';
+                showToast(`Failed to delete experience: ${response.error}`, 'danger');
+              }
+            }).catch(error => {
+              // Restore the entry on error
+              entry.classList.remove('opacity-50');
+              entry.style.pointerEvents = '';
+              showToast(`Error deleting experience: ${error.message}`, 'danger');
+            });
+          }
+        } else {
+          // Simply remove from DOM if it's a new entry not yet saved
+          entry.remove();
+        }
+      };
+      
+      container.appendChild(clone);
+    }
+    
+    function collectExperienceEntries() {
+      const entries = [];
+      const entryElements = document.querySelectorAll('.experience-entry');
+      
+      entryElements.forEach(entry => {
+        const title = entry.querySelector('.experience-title').value.trim();
+        const company = entry.querySelector('.experience-company').value.trim();
+        const startDate = entry.querySelector('.experience-start-date').value;
+        const endDate = entry.querySelector('.experience-end-date').value;
+        const description = entry.querySelector('.experience-description').value.trim();
+        
+        // Only add if at least title and company are provided
+        if (title && company) {
+          // Keep existing ID if it was in the original data
+          const entryData = {
+            title,
+            company,
+            description
+          };
+          
+          if (startDate) {
+            entryData.startDate = startDate;
+          }
+          
+          if (endDate) {
+            entryData.endDate = endDate;
+          }
+          
+          // Add the ID if this is an existing entry
+          const entryId = entry.getAttribute('data-id');
+          if (entryId) {
+            entryData.id = entryId;
+          }
+          
+          entries.push(entryData);
+        }
+      });
+      
+      return entries;
+    }
+    
+    // Function to save experience entries to the backend
+    async function saveExperienceEntries(entries) {
+      let allSuccess = true;
+      const updatedEntries = [];
+      
+      // Process each experience entry
+      for (const entry of entries) {
+        try {
+          let result;
+          
+          if (entry.id) {
+            // This is an existing entry - update it
+            const entryId = entry.id;
+            delete entry.id; // Remove the id before sending to API
+            result = await updateExperience(entryId, entry);
+          } else {
+            // This is a new entry - create it
+            result = await createExperience(entry);
+          }
+          
+          if (!result.error) {
+            updatedEntries.push(result);
+          } else {
+            console.error(`Error saving experience entry: ${result.error}`);
+            allSuccess = false;
+          }
+        } catch (error) {
+          console.error('Error processing experience entry:', error);
+          allSuccess = false;
+        }
+      }
+      
+      return {
+        success: allSuccess,
+        entries: updatedEntries
+      };
+    }
+    
+    function updateExperienceDisplay(experience) {
+      const experienceList = document.getElementById('experience-list');
+      const experienceSection = document.getElementById('experience-section');
+      
+      // Clear existing experience entries
+      experienceList.innerHTML = '';
+      
+      // Filter out experience entries without title/company info
+      const validExperience = experience.filter(exp => exp.title && exp.company);
+      
+      if (validExperience.length > 0) {
+        experienceSection.style.display = 'block';
+        
+        validExperience.forEach(exp => {
+          const experienceCard = document.createElement('div');
+          experienceCard.className = 'mb-3';
+          
+          const dateRange = exp.startDate && exp.endDate ? 
+            `${new Date(exp.startDate).getFullYear()} - ${new Date(exp.endDate).getFullYear()}` : 
+            (exp.startDate ? `${new Date(exp.startDate).getFullYear()} - Present` : '');
+          
+          experienceCard.innerHTML = `
+            <div class="mb-1">
+              <strong>${exp.title}</strong>
+              ${dateRange ? `<span class="text-muted ms-2">${dateRange}</span>` : ''}
+            </div>
+            <div class="mb-1 text-primary">${exp.company}</div>
+            ${exp.description ? `<p class="text-muted small mb-0">${exp.description}</p>` : ''}
+          `;
+          
+          experienceList.appendChild(experienceCard);
+        });
+      } else {
+        experienceSection.style.display = 'none';
+      }
+    }
 
     // Logout button logic
     document.getElementById("logout-btn").onclick = function(e) {
