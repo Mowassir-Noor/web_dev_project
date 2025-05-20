@@ -188,6 +188,26 @@
         </div>
         
         <div class="mb-3">
+          <label for="resume-upload" class="form-label">Resume (PDF)</label>
+          <div class="d-flex align-items-center gap-2">
+            <input type="file" class="form-control" id="resume-upload" accept=".pdf" />
+            <button type="button" class="btn btn-outline-primary" id="upload-resume-btn">
+              <i class="bi bi-upload"></i> Upload
+            </button>
+          </div>
+          <div class="form-text text-muted mt-1">
+            <i class="bi bi-info-circle"></i> Upload your resume in PDF format
+          </div>
+          <div id="resume-upload-status" class="mt-2" style="display: none;"></div>
+          <div id="current-resume" class="mt-2" style="display: none;">
+            <span class="badge bg-success">
+              <i class="bi bi-file-earmark-pdf-fill me-1"></i>
+              Current resume: <a href="#" id="resume-link" class="text-white" target="_blank">View Resume</a>
+            </span>
+          </div>
+        </div>
+        
+        <div class="mb-3">
           <label class="form-label">Skills</label>
           <div id="edit-skills-container" class="d-flex flex-wrap gap-2 mb-2"></div>
           <div class="input-group">
@@ -508,6 +528,9 @@
       if (data.resumeUrl) {
         const downloadBtn = document.getElementById("download-cv-btn");
         downloadBtn.href = data.resumeUrl;
+        downloadBtn.style.display = "block";
+      } else {
+        document.getElementById("download-cv-btn").style.display = "none";
       }
       
       // Display education information
@@ -537,7 +560,116 @@
     const nameEl = document.querySelector(".profile-name");
     const emailEl = document.querySelector(".profile-email");
     const summaryEl = document.querySelector(".profile-summary");
-    const avatarImg = document.querySelector(".profile-avatar-img");      // Add Enter key handler for adding skills
+    const avatarImg = document.querySelector(".profile-avatar-img");
+    
+    // Resume upload handler
+    document.getElementById("upload-resume-btn")?.addEventListener('click', uploadResume);
+    
+    // Function to upload resume
+    async function uploadResume() {
+      const fileInput = document.getElementById('resume-upload');
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        showResumeUploadStatus('danger', 'Please select a PDF file to upload.');
+        return;
+      }
+      
+      if (file.type !== 'application/pdf') {
+        showResumeUploadStatus('danger', 'Only PDF files are allowed.');
+        return;
+      }
+      
+      // Show loading status
+      const uploadBtn = document.getElementById('upload-resume-btn');
+      const originalBtnText = uploadBtn.innerHTML;
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...';
+      
+      try {
+        // Create form data
+        const formData = new FormData();
+        formData.append('resume', file);
+        
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+        
+        // Upload the file
+        const response = await fetch('https://web-backend-7aux.onrender.com/api/v1/users/resume', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Upload failed with status ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        // Update the UI
+        showResumeUploadStatus('success', 'Resume uploaded successfully!');
+        
+        // Update user data and display
+        if (result.resumeUrl) {
+          if (userData) {
+            userData.resumeUrl = result.resumeUrl;
+          }
+          
+          // Update download button in profile
+          const downloadBtn = document.getElementById("download-cv-btn");
+          if (downloadBtn) {
+            downloadBtn.href = result.resumeUrl;
+          }
+          
+          // Show the current resume link
+          showCurrentResume(result.resumeUrl);
+        }
+        
+        // Clear the file input
+        fileInput.value = '';
+        
+      } catch (error) {
+        console.error('Error uploading resume:', error);
+        showResumeUploadStatus('danger', `Failed to upload resume: ${error.message}`);
+      } finally {
+        // Reset button state
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = originalBtnText;
+      }
+    }
+    
+    // Function to show resume upload status
+    function showResumeUploadStatus(type, message) {
+      const statusElement = document.getElementById('resume-upload-status');
+      statusElement.className = `alert alert-${type} py-2`;
+      statusElement.textContent = message;
+      statusElement.style.display = 'block';
+      
+      // Hide the status after a few seconds
+      setTimeout(() => {
+        statusElement.style.display = 'none';
+      }, 5000);
+    }
+    
+    // Function to show current resume
+    function showCurrentResume(url) {
+      const currentResumeElement = document.getElementById('current-resume');
+      const resumeLink = document.getElementById('resume-link');
+      
+      if (url) {
+        resumeLink.href = url;
+        currentResumeElement.style.display = 'block';
+      } else {
+        currentResumeElement.style.display = 'none';
+      }
+    }
+    
+    // Add Enter key handler for adding skills
     document.getElementById('new-skill-input')?.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -592,6 +724,11 @@
       // Add location to edit form if available
       if (userData && userData.location) {
         document.getElementById("edit-location").value = userData.location;
+      }
+      
+      // Show current resume if available
+      if (userData && userData.resumeUrl) {
+        showCurrentResume(userData.resumeUrl);
       }
       
       // Populate skills
