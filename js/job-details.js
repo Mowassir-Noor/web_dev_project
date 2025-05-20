@@ -100,9 +100,25 @@ function renderJobDetails(job) {
         </div>
       </div>
     </div>
+    
+    <!-- Application Modal -->
+    <div class="auth-modal-backdrop" id="application-modal" style="display: none;">
+      <div class="auth-modal" style="width: 500px; max-width: 95%;">
+        <button class="auth-modal-close" id="close-application-modal">&times;</button>
+        <h3>Apply for ${job.title}</h3>
+        <form id="application-form">
+          <div class="mb-3">
+            <label for="cover-letter" class="form-label">Cover Letter</label>
+            <textarea class="form-control" id="cover-letter" rows="6" placeholder="Write your cover letter here..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit Application</button>
+          <div id="application-status" class="mt-3" style="display: none;"></div>
+        </form>
+      </div>
+    </div>
   `);
   
-  // Setup apply button handler
+  // Setup application modal handlers
   $('#apply-btn').on('click', function(e) {
     e.preventDefault();
     
@@ -113,9 +129,89 @@ function renderJobDetails(job) {
       return;
     }
     
-    alert('Your application has been submitted!');
-    // Future implementation: actually submit application to API
+    // Show application modal
+    $('#application-modal').fadeIn(200);
   });
+  
+  $('#close-application-modal').on('click', function() {
+    $('#application-modal').fadeOut(200);
+  });
+  
+  // Handle form submission
+  $('#application-form').on('submit', function(e) {
+    e.preventDefault();
+    
+    const coverLetter = $('#cover-letter').val();
+    
+    if (!coverLetter) {
+      showApplicationStatus('danger', 'Please provide a cover letter.');
+      return;
+    }
+    
+    // Get token for authorization
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showApplicationStatus('danger', 'Authentication error. Please log in again.');
+      return;
+    }
+    
+    // Show loading state
+    $('#application-form button[type="submit"]').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...');
+    $('#application-form button[type="submit"]').prop('disabled', true);
+    
+    // Prepare application data
+    const applicationData = {
+      jobId: job._id,
+      coverLetter: coverLetter
+    };
+    
+    // Submit application
+    axios.post('https://web-backend-7aux.onrender.com/api/v1/applications', applicationData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (response.data) {
+        // Show success message
+        showApplicationStatus('success', 'Your application has been successfully submitted!');
+        
+        // Reset form
+        $('#application-form')[0].reset();
+        
+        // Close modal after a delay
+        setTimeout(function() {
+          $('#application-modal').fadeOut(200);
+        }, 2000);
+      } else {
+        showApplicationStatus('danger', 'There was an error submitting your application. Please try again.');
+      }
+    })
+    .catch(error => {
+      console.error('Error submitting application:', error);
+      let errorMessage = 'There was an error submitting your application.';
+      
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      showApplicationStatus('danger', errorMessage);
+    })
+    .finally(() => {
+      // Reset button state
+      $('#application-form button[type="submit"]').html('Submit Application');
+      $('#application-form button[type="submit"]').prop('disabled', false);
+    });
+  });
+  
+  // Helper function to show application status
+  function showApplicationStatus(type, message) {
+    const statusElement = $('#application-status');
+    statusElement.removeClass('alert-success alert-danger').addClass(`alert alert-${type}`);
+    statusElement.html(message);
+    statusElement.fadeIn();
+  }
 }
 
 $(document).ready(function() {
@@ -130,4 +226,11 @@ $(document).ready(function() {
   if (typeof updateAuthButtonsVisibility === 'function') {
     updateAuthButtonsVisibility();
   }
+  
+  // Close application modal when clicking outside
+  $(document).on('click', '.auth-modal-backdrop', function(e) {
+    if ($(e.target).hasClass('auth-modal-backdrop')) {
+      $('.auth-modal-backdrop').fadeOut(200);
+    }
+  });
 });
