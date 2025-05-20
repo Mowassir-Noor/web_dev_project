@@ -1,0 +1,219 @@
+/* 
+ * Profile Page Color Enhancements
+ * This file contains improvements to the color scheme of the profile page
+ * to ensure text colors match with backgrounds and create visual consistency
+ */
+
+/* General section styles */
+#education-section,
+#experience-section,
+#skills-section {
+  background: linear-gradient(90deg, rgba(57, 62, 70, 0.5) 0%, rgba(35, 39, 46, 0.5) 100%);
+  border-radius: 12px;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(0, 173, 181, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 173, 181, 0.1);
+}
+
+/* Section titles */
+#education-section h6,
+#experience-section h6,
+#skills-section h6 {
+  color: #00ADB5;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(0, 173, 181, 0.3);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Experience entry styles */
+#experience-list .mb-3 {
+  background: linear-gradient(90deg, rgba(57, 62, 70, 0.7) 0%, rgba(35, 39, 46, 0.7) 100%);
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.8rem !important;
+  border-left: 3px solid #00ADB5;
+}
+
+/* Job title styling */
+#experience-list strong {
+  color: #EEEEEE;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+/* Company name styling */
+#experience-list .text-primary {
+  color: #00ADB5 !important;
+  font-weight: 500;
+}
+
+/* Experience date range */
+#experience-list .text-muted {
+  color: #94B4C1 !important;
+  font-size: 0.9rem;
+}
+
+/* Description styling */
+#experience-list p.text-muted {
+  color: #EEEEEE !important;
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+/* Education entry styles */
+#education-list .mb-3 {
+  background: linear-gradient(90deg, rgba(57, 62, 70, 0.7) 0%, rgba(35, 39, 46, 0.7) 100%);
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.8rem !important;
+  border-left: 3px solid #00ADB5;
+}
+
+/* Institution styling */
+#education-list strong {
+  color: #EEEEEE;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+/* Degree styling */
+#education-list .mb-1:nth-child(2) {
+  color: #00ADB5;
+  font-weight: 500;
+}
+
+/* Education date range */
+#education-list .text-muted {
+  color: #94B4C1 !important;
+  font-size: 0.9rem;
+}
+
+/* Skills styling */
+#skills-list .badge {
+  background-color: rgba(57, 62, 70, 0.8) !important;
+  color: #00ADB5 !important;
+  border-color: rgba(0, 173, 181, 0.5) !important;
+  font-weight: 500;
+  padding: 0.5em 0.85em;
+  transition: all 0.2s ease;
+}
+
+#skills-list .badge:hover {
+  background-color: rgba(0, 173, 181, 0.2) !important;
+  box-shadow: 0 0 8px rgba(0, 173, 181, 0.5);
+}
+
+/* Location styling */
+.user-location .text-muted {
+  color: #94B4C1 !important;
+}
+
+/* Improved gradient text */
+.gradient-text {
+  background: linear-gradient(90deg, #00ADB5 0%, #66C5CC 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Edit modal styling */
+.auth-modal-backdrop {
+  background: rgba(34, 40, 49, 0.85);
+  backdrop-filter: blur(4px);
+}
+
+.auth-modal {
+  background: linear-gradient(135deg, #2A3038 0%, #222831 100%);
+  border: 1px solid rgba(0, 173, 181, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 173, 181, 0.3);
+}
+
+.auth-modal .form-label {
+  color: #EEEEEE !important;
+  font-weight: 500;
+}
+
+.auth-modal .form-control,
+.auth-modal .form-select {
+  background-color: rgba(57, 62, 70, 0.5);
+  border: 1px solid rgba(0, 173, 181, 0.3);
+  color: #EEEEEE;
+}
+
+.auth-modal .form-control:focus,
+.auth-modal .form-select:focus {
+  background-color: rgba(57, 62, 70, 0.7);
+  border-color: rgba(0, 173, 181, 0.6);
+  box-shadow: 0 0 0 0.25rem rgba(0, 173, 181, 0.25);
+  color: #EEEEEE;
+}
+
+.auth-modal .form-text {
+  color: rgba(238, 238, 238, 0.6) !important;
+}
+
+.auth-modal-close {
+  color: #EEEEEE;
+  background-color: transparent;
+  border: none;
+  font-size: 1.5rem;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.auth-modal-close:hover {
+  opacity: 1;
+  color: #00ADB5;
+}
+
+/* Skill badge styling */
+.skill-badge {
+  background-color: rgba(57, 62, 70, 0.8) !important;
+  color: #00ADB5 !important;
+  border: 1px solid rgba(0, 173, 181, 0.5) !important;
+  font-weight: 500;
+  padding: 0.5em 0.85em;
+  transition: all 0.2s ease;
+}
+
+.skill-badge:hover {
+  background-color: rgba(0, 173, 181, 0.2) !important;
+  box-shadow: 0 0 8px rgba(0, 173, 181, 0.5);
+}
+
+/* Button styling */
+.profile-btn {
+  background-color: #00ADB5 !important;
+  border-color: #00ADB5 !important;
+  color: #222831 !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.profile-btn:hover, 
+.profile-btn:focus {
+  background-color: #00C2CC !important;
+  border-color: #00C2CC !important;
+  box-shadow: 0 0 12px rgba(0, 173, 181, 0.6) !important;
+  transform: translateY(-2px);
+}
+
+.profile-btn-outline {
+  color: #00ADB5 !important;
+  border-color: #00ADB5 !important;
+  background-color: transparent !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.profile-btn-outline:hover,
+.profile-btn-outline:focus {
+  background-color: rgba(0, 173, 181, 0.15) !important;
+  color: #00C2CC !important;
+  border-color: #00C2CC !important;
+  box-shadow: 0 0 12px rgba(0, 173, 181, 0.4) !important;
+  transform: translateY(-2px);
+}

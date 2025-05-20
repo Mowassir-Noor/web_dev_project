@@ -1,0 +1,275 @@
+/* 
+ * Extended Profile Enhancements
+ * Additional styling for the experience section and overall profile consistency
+ */
+
+/* Enhanced Experience Entry Styling */
+#experience-list .mb-3,
+#education-list .mb-3 {
+  position: relative;
+  background: linear-gradient(90deg, rgba(57, 62, 70, 0.7) 0%, rgba(35, 39, 46, 0.7) 100%);
+  padding: 1rem 1.2rem;
+  border-radius: 10px;
+  margin-bottom: 1rem !important;
+  border-left: 3px solid #00ADB5;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Hover effect for experience entries */
+#experience-list .mb-3:hover,
+#education-list .mb-3:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 173, 181, 0.15);
+  border-left: 4px solid #00ADB5;
+  background: linear-gradient(90deg, rgba(57, 62, 70, 0.8) 0%, rgba(35, 39, 46, 0.8) 100%);
+}
+
+/* Enhanced date badge */
+#experience-list .text-muted,
+#education-list .text-muted {
+  background-color: rgba(0, 173, 181, 0.15);
+  border-radius: 12px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: #94B4C1 !important;
+  border: 1px solid rgba(0, 173, 181, 0.2);
+  display: inline-block;
+}
+
+/* Company name styling */
+#experience-list .text-primary,
+#education-list .text-primary,
+#education-list .mb-1:nth-child(2) {
+  color: #00ADB5 !important;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  padding-top: 0.2rem;
+}
+
+#experience-list .text-primary::before {
+  content: "\f1ad"; /* Building icon from Bootstrap Icons */
+  font-family: "bootstrap-icons";
+  margin-right: 0.4rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+#education-list .text-primary::before {
+  content: "\f5d5"; /* Graduation cap icon from Bootstrap Icons */
+  font-family: "bootstrap-icons";
+  margin-right: 0.4rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Description styling with better readability */
+#experience-list p.text-muted,
+#education-list p.text-muted {
+  color: rgba(238, 238, 238, 0.85) !important;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-top: 0.6rem !important;
+  padding-top: 0.6rem;
+  border-top: 1px dashed rgba(0, 173, 181, 0.2);
+}
+
+/* Add small glow effect to section titles */
+#education-section h6,
+#experience-section h6,
+#skills-section h6 {
+  text-shadow: 0 0 10px rgba(0, 173, 181, 0.3);
+}
+
+/* Enhanced section container styling */
+#education-section,
+#experience-section,
+#skills-section {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Add subtle background pattern */
+#education-section::before,
+#experience-section::before,
+#skills-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: radial-gradient(rgba(0, 173, 181, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Enhanced profile banner */
+.profile-banner-modern {
+  background: linear-gradient(-45deg, #222831, #393E46, #00656E, #00ADB5);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  height: 160px;
+  border-radius: 12px 12px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-banner-modern::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2300ADB5' fill-opacity='0.08' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.3;
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Enhanced profile card */
+.profile-avatar-modern {
+  border: 4px solid rgba(0, 173, 181, 0.4);
+  box-shadow: 0 0 20px rgba(0, 173, 181, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 10;
+}
+
+.profile-avatar-modern:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 25px rgba(0, 173, 181, 0.5);
+}
+
+.profile-summary-box-modern {
+  background: linear-gradient(90deg, rgba(57, 62, 70, 0.7) 0%, rgba(35, 39, 46, 0.7) 100%);
+  border-left: 3px solid #00ADB5;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-summary-box-modern::before {
+  content: """;
+  position: absolute;
+  top: -15px;
+  left: 10px;
+  font-size: 5rem;
+  color: rgba(0, 173, 181, 0.1);
+  font-family: serif;
+  line-height: 1;
+}
+
+/* Enhanced profile card container */
+.profile-card-modern {
+  overflow: visible !important;
+  transition: transform 0.3s ease;
+}
+
+.profile-card-modern:hover {
+  transform: translateY(-5px);
+}
+
+/* Modified styles for saved jobs section */
+.saved-job-modern {
+  border-left: 3px solid transparent;
+  transition: all 0.25s ease;
+  background: linear-gradient(90deg, rgba(57, 62, 70, 0.5) 0%, rgba(35, 39, 46, 0.5) 100%);
+  margin-bottom: 0.8rem;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+}
+
+.saved-job-modern:hover {
+  border-left-color: #00ADB5;
+  background: linear-gradient(90deg, rgba(57, 62, 70, 0.7) 0%, rgba(35, 39, 46, 0.7) 100%);
+  transform: translateX(3px);
+}
+
+.saved-job-modern a {
+  color: #EEEEEE;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.saved-job-modern a:hover {
+  color: #00ADB5;
+}
+
+.job-type-badge {
+  background-color: rgba(0, 173, 181, 0.15) !important;
+  color: #00ADB5 !important;
+  border: 1px solid rgba(0, 173, 181, 0.3);
+  font-weight: 500;
+}
+
+/* Experience title font enhancement */
+#experience-list strong,
+#education-list strong {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #EEEEEE;
+  letter-spacing: 0.02em;
+}
+
+/* Animation for experience and education entries */
+#experience-list .mb-3,
+#education-list .mb-3 {
+  opacity: 0;
+  animation: fadeIn 0.4s ease forwards;
+  animation-delay: calc(0.1s * var(--index, 0));
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhance job listing section title */
+.profile-savedjobs-modern h5.card-title {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+}
+
+.profile-savedjobs-modern h5.card-title:after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #00ADB5 0%, rgba(0, 173, 181, 0.3) 100%);
+  border-radius: 3px;
+}
+
+/* Enhanced card styling for saved jobs container */
+.profile-savedjobs-modern {
+  background: linear-gradient(135deg, rgba(57, 62, 70, 0.7) 0%, rgba(35, 39, 46, 0.7) 100%);
+  border-radius: 12px !important;
+  padding: 0.5rem;
+  margin-top: 2rem;
+}
