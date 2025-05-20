@@ -1,12 +1,12 @@
 /* Job Form Modal Specific Styles */
-.job-form-modal {
+.job-form-modal, .applicants-modal {
   width: 800px;
   max-width: 95vw;
   max-height: 90vh;
   overflow-y: auto;
 }
 
-.job-modal-content {
+.job-modal-content, .applicants-modal-content {
   padding: 1rem;
 }
 
@@ -405,4 +405,105 @@
   0% { box-shadow: 0 0 0 0 rgba(0, 173, 181, 0.8); }
   70% { box-shadow: 0 0 0 15px rgba(0, 173, 181, 0); }
   100% { box-shadow: 0 0 0 0 rgba(0, 173, 181, 0); }
+}
+
+/* Applicants Modal Specific Styles */
+.applicants-modal {
+  width: 900px;
+  max-height: 85vh;
+}
+
+#modal-job-details {
+  background-color: rgba(0, 173, 181, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  border-left: 4px solid #00ADB5;
+}
+
+.applicant-card {
+  background: linear-gradient(120deg, #23272e 60%, #393E46 100%);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(0, 173, 181, 0.3);
+  transition: all 0.3s ease;
+}
+
+.applicant-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 173, 181, 0.2);
+  border-color: #00ADB5;
+}
+
+.applicant-name {
+  color: #00ADB5;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.applicant-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-applied {
+  background-color: rgba(0, 123, 255, 0.15);
+  color: #0d6efd;
+}
+
+.status-reviewed {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+}
+
+.status-rejected {
+  background-color: rgba(220, 53, 69, 0.15);
+  color: #dc3545;
+}
+
+.status-accepted {
+  background-color: rgba(25, 135, 84, 0.15);
+  color: #198754;
+}
+
+.applicant-email, .applicant-location, .applicant-date {
+  color: #EEEEEE;
+  opacity: 0.75;
+  font-size: 0.9rem;
+}
+
+.applicant-actions .btn {
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.cover-letter-preview, .applicant-bio {
+  background-color: rgba(238, 238, 238, 0.05);
+  border-radius: 8px;
+  padding: 16px;
+  color: #EEEEEE;
+  opacity: 0.9;
+  position: relative;
+}
+
+.cover-letter-preview {
+  margin-top: 16px;
+}
+
+.cover-letter-preview::before, .applicant-bio::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 16px;
+  width: 24px;
+  height: 2px;
+  background-color: #00ADB5;
+}
+
+.no-results-message {
+  background-color: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.2);
+  color: #fff9e6;
 }
