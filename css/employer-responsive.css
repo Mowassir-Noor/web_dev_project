@@ -1,0 +1,536 @@
+/* Employer Dashboard Responsive Styles - Card-based layout */
+
+/* Base styles for all devices */
+.employer-dashboard .table-responsive {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Filter bar styling */
+.filter-bar {
+  background-color: rgba(57, 62, 70, 0.3);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.filter-bar .form-control,
+.filter-bar .form-select,
+.filter-bar .input-group-text {
+  background-color: rgba(35, 39, 46, 0.5);
+  border-color: rgba(57, 62, 70, 0.5);
+  color: #EEEEEE;
+}
+
+.filter-bar .form-control::placeholder {
+  color: #AAA;
+}
+
+.filter-bar .form-control:focus,
+.filter-bar .form-select:focus {
+  background-color: rgba(35, 39, 46, 0.7);
+  border-color: #00ADB5;
+  box-shadow: 0 0 0 0.15rem rgba(0, 173, 181, 0.25);
+}
+
+.filter-bar .form-select {
+  color: #EEEEEE;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23EEEEEE' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+/* Job form transitions */
+#job-form-container {
+  transition: opacity 0.3s ease;
+}
+
+/* Refresh button animation */
+#refresh-jobs {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+#refresh-jobs:hover {
+  transform: scale(1.1);
+}
+
+#refresh-jobs i {
+  transition: transform 0.8s ease-in-out;
+}
+
+#refresh-jobs i.fa-spin {
+  animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error shake animation for job cards */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake-animation {
+  animation: shake 0.8s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Currently editing job card */
+.job-card.editing {
+  border: 2px solid #00ADB5;
+  border-left-width: 4px;
+  box-shadow: 0 4px 15px rgba(0, 173, 181, 0.3) !important;
+  position: relative;
+}
+
+.job-card.editing::before {
+  content: 'Editing';
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #00ADB5;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-bottom-left-radius: 6px;
+  z-index: 2;
+}
+
+/* Enhanced card interactions */
+.job-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-left: 4px solid #00ADB5;
+  background-color: rgba(57, 62, 70, 0.5);
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.job-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(120deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.05) 60%, rgba(255, 255, 255, 0) 100%);
+  transform: translateX(-100%);
+  transition: transform 0.8s ease;
+}
+
+.job-card:hover::after {
+  transform: translateX(100%);
+}
+
+.job-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
+}
+
+/* Card loading and deleting animations */
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.5; }
+}
+
+.job-card.deleting {
+  animation: pulse 1.5s infinite;
+}
+
+/* Button hover effects */
+.job-card .btn-outline-primary {
+  border-color: rgba(0, 173, 181, 0.6);
+  color: rgba(0, 173, 181, 0.9);
+  transition: all 0.2s ease;
+}
+
+.job-card .btn-outline-primary:hover {
+  background-color: rgba(0, 173, 181, 0.9);
+  border-color: rgba(0, 173, 181, 1);
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 173, 181, 0.3);
+}
+
+/* Edit button styling */
+.job-card .btn-outline-secondary {
+  border-color: rgba(108, 117, 125, 0.6);
+  color: rgba(108, 117, 125, 0.9);
+  transition: all 0.2s ease;
+}
+
+.job-card .btn-outline-secondary:hover {
+  background-color: rgba(108, 117, 125, 0.9);
+  border-color: rgba(108, 117, 125, 1);
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+
+.job-card .btn-outline-danger {
+  border-color: rgba(220, 53, 69, 0.6);
+  color: rgba(220, 53, 69, 0.8);
+  transition: all 0.2s ease;
+}
+
+.job-card .btn-outline-danger:hover {
+  background-color: rgba(220, 53, 69, 0.9);
+  border-color: rgba(220, 53, 69, 1);
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* Badge styling improvements */
+.job-card .badge {
+  padding: 0.35em 0.65em;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.job-card:hover .badge {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+/* Table column visibility management for different screen sizes */
+@media (max-width: 991.98px) {
+  /* For tablets and below */
+  .employer-dashboard .job-summary-container {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  .employer-dashboard .job-summary-container .badge {
+    margin-top: 0.5rem;
+  }
+  
+  /* Filter bar adjustments for tablets */
+  .filter-bar .form-select {
+    width: 120px !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  /* For small tablets and large phones */
+  .employer-dashboard .job-cards-container .col-md-6 {
+    padding: 0 0.75rem;
+  }
+  
+  /* Make form labels more prominent on mobile */
+  #job-form-container .form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Adjust button sizing for better touch targets */
+  .job-card .btn {
+    padding: 0.5rem 0.85rem;
+  }
+  
+  /* Filter bar adjustments for small tablets */
+  .filter-bar {
+    padding: 0.75rem;
+  }
+  
+  .filter-bar .d-flex.gap-2 {
+    margin-top: 0.5rem;
+    justify-content: space-between !important;
+    width: 100%;
+  }
+  
+  .filter-bar .form-select {
+    flex: 1;
+    max-width: 48%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  /* For mobile phones */
+  .employer-dashboard .job-cards-container {
+    padding: 0 0.5rem;
+  }
+  
+  /* Adjust card spacing */
+  .job-card {
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Ensure job card content is optimized for small screens */
+  .job-card .card-body {
+    padding: 1rem;
+  }
+  
+  /* Card header adjustments */
+  .employer-dashboard .card-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .employer-dashboard .card-header h4 {
+    font-size: 1.25rem;
+  }
+  
+  /* Adjust alert spacing */
+  .employer-dashboard .alert {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Filter bar adjustments for phones */
+  .filter-bar {
+    padding: 0.75rem;
+  }
+  
+  .filter-bar .d-flex.gap-2 {
+    flex-wrap: wrap;
+  }
+  
+  .filter-bar .form-select {
+    font-size: 0.875rem;
+  }
+}
+
+/* Loading spinner adjustments for all screen sizes */
+.employer-dashboard .spinner-container {
+  padding: 2rem 0;
+}
+
+/* Improved job listing item styles */
+.job-list-item {
+  border-left: 3px solid #00ADB5;
+  transition: all 0.2s ease;
+}
+
+.job-list-item:hover {
+  background-color: rgba(0, 173, 181, 0.05);
+}
+
+/* Job card styling for all devices */
+.job-card {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-left: 4px solid #00ADB5;
+  background-color: rgba(57, 62, 70, 0.5);
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.job-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(120deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.05) 60%, rgba(255, 255, 255, 0) 100%);
+  transform: translateX(-100%);
+  transition: transform 0.8s ease;
+}
+
+.job-card:hover::after {
+  transform: translateX(100%);
+}
+
+.job-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
+}
+
+/* Card loading and deleting animations */
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.5; }
+}
+
+.job-card.deleting {
+  animation: pulse 1.5s infinite;
+}
+
+/* Button hover effects */
+.job-card .btn-outline-primary {
+  border-color: rgba(0, 173, 181, 0.6);
+  color: rgba(0, 173, 181, 0.9);
+  transition: all 0.2s ease;
+}
+
+.job-card .btn-outline-primary:hover {
+  background-color: rgba(0, 173, 181, 0.9);
+  border-color: rgba(0, 173, 181, 1);
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 173, 181, 0.3);
+}
+
+/* Edit button styling */
+.job-card .btn-outline-secondary {
+  border-color: rgba(108, 117, 125, 0.6);
+  color: rgba(108, 117, 125, 0.9);
+  transition: all 0.2s ease;
+}
+
+.job-card .btn-outline-secondary:hover {
+  background-color: rgba(108, 117, 125, 0.9);
+  border-color: rgba(108, 117, 125, 1);
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+
+.job-card .btn-outline-danger {
+  border-color: rgba(220, 53, 69, 0.6);
+  color: rgba(220, 53, 69, 0.8);
+  transition: all 0.2s ease;
+}
+
+.job-card .btn-outline-danger:hover {
+  background-color: rgba(220, 53, 69, 0.9);
+  border-color: rgba(220, 53, 69, 1);
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* Badge styling improvements */
+.job-card .badge {
+  padding: 0.35em 0.65em;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.job-card:hover .badge {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+
+/* Table column visibility management for different screen sizes */
+@media (max-width: 991.98px) {
+  /* For tablets and below */
+  .employer-dashboard .job-summary-container {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  .employer-dashboard .job-summary-container .badge {
+    margin-top: 0.5rem;
+  }
+  
+  /* Filter bar adjustments for tablets */
+  .filter-bar .form-select {
+    width: 120px !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  /* For small tablets and large phones */
+  .employer-dashboard .job-cards-container .col-md-6 {
+    padding: 0 0.75rem;
+  }
+  
+  /* Make form labels more prominent on mobile */
+  #job-form-container .form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Adjust button sizing for better touch targets */
+  .job-card .btn {
+    padding: 0.5rem 0.85rem;
+  }
+  
+  /* Filter bar adjustments for small tablets */
+  .filter-bar {
+    padding: 0.75rem;
+  }
+  
+  .filter-bar .d-flex.gap-2 {
+    margin-top: 0.5rem;
+    justify-content: space-between !important;
+    width: 100%;
+  }
+  
+  .filter-bar .form-select {
+    flex: 1;
+    max-width: 48%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  /* For mobile phones */
+  .employer-dashboard .job-cards-container {
+    padding: 0 0.5rem;
+  }
+  
+  /* Adjust card spacing */
+  .job-card {
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Ensure job card content is optimized for small screens */
+  .job-card .card-body {
+    padding: 1rem;
+  }
+  
+  /* Card header adjustments */
+  .employer-dashboard .card-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .employer-dashboard .card-header h4 {
+    font-size: 1.25rem;
+  }
+  
+  /* Adjust alert spacing */
+  .employer-dashboard .alert {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Filter bar adjustments for phones */
+  .filter-bar {
+    padding: 0.75rem;
+  }
+  
+  .filter-bar .d-flex.gap-2 {
+    flex-wrap: wrap;
+  }
+  
+  .filter-bar .form-select {
+    font-size: 0.875rem;
+  }
+}
+
+/* Improve form alerts for mobile */
+#form-alerts .alert {
+  margin-bottom: 1rem;
+}
+
+#form-alerts .alert i {
+  font-size: 1.25rem;
+}
+
+/* Make forms more touch-friendly on mobile */
+@media (max-width: 767.98px) {
+  #job-form-container .form-control,
+  #job-form-container .form-select {
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    height: auto;
+  }
+  
+  /* Improve button usability on touch screens */
+  #submit-job-btn {
+    padding: 0.625rem 1rem;
+    font-size: 1rem;
+  }
+}
+
+/* Button shake animation for error feedback */
+.button-shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
