@@ -9,10 +9,17 @@
       },
       error => Promise.reject(error)
     );
-
   // Logout function
     function logout() {
       localStorage.removeItem('token');
+      localStorage.removeItem('userRole');
+      
+      // Hide employer nav item when logging out
+      const employerNavItem = document.querySelector('.nav-item a[href="employer.html"]')?.parentElement;
+      if (employerNavItem) {
+        employerNavItem.style.display = 'none';
+      }
+      
       alert('Logged out!');
       updateAuthButtonsVisibility();
     }
@@ -20,16 +27,55 @@
 // Function to update auth buttons visibility based on login state
 function updateAuthButtonsVisibility() {
   const token = localStorage.getItem('token');
+  const userRole = localStorage.getItem('userRole');
   const loginBtn = document.getElementById('login-btn');
   const signupBtn = document.getElementById('signup-btn');
+  const logoutBtn = document.getElementById('logout-btn');
+  const employerNavItem = document.querySelector('.nav-item a[href="employer.html"]')?.parentElement;
+  
+  // Toggle employer menu item based on role
+  if (employerNavItem) {
+    employerNavItem.style.display = (userRole === 'recruiter') ? '' : 'none';
+  }
   
   if (loginBtn && signupBtn) {
     if (token) {
+      // User is logged in
       loginBtn.style.display = 'none';
       signupBtn.style.display = 'none';
+      
+      // Create logout button if it doesn't exist
+      if (!logoutBtn) {
+        const navbarNav = document.getElementById('navbarNav');
+        if (navbarNav) {
+          const logoutBtnElement = document.createElement('a');
+          logoutBtnElement.href = '#';
+          logoutBtnElement.id = 'logout-btn';
+          logoutBtnElement.className = 'navbar-auth-btn';
+          logoutBtnElement.textContent = 'Logout';          logoutBtnElement.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            localStorage.removeItem('userRole');
+            
+            // Hide employer nav item when logging out
+            const employerNavItem = document.querySelector('.nav-item a[href="employer.html"]')?.parentElement;
+            if (employerNavItem) {
+              employerNavItem.style.display = 'none';
+            }
+            
+            alert('Logged out!');
+            window.location.reload();
+          });
+          navbarNav.appendChild(logoutBtnElement);
+        }
+      } else {
+        logoutBtn.style.display = '';
+      }
     } else {
+      // User is not logged in
       loginBtn.style.display = '';
       signupBtn.style.display = '';
+      if (logoutBtn) logoutBtn.style.display = 'none';
     }
   }
 }
@@ -113,14 +159,47 @@ function renderAuthForm(type) {
       const email = this.querySelector('input[placeholder="Email"]').value;
       const password = this.querySelector('input[placeholder="Password"]').value;
       const payload = { email, password };
-      try {
-        const response = await axios.post(
+      try {        const response = await axios.post(
           'https://web-backend-7aux.onrender.com/api/v1/auth/sign-in',
           JSON.stringify(payload),
           { headers: { 'Content-Type': 'application/json' } }
         );
+        console.log('Sign-in response:', response.data);
+        
         const token = response.data.data.token;
         localStorage.setItem('token', token);
+        
+        // Store user role if available
+        try {
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const decodedToken = JSON.parse(atob(base64));
+          console.log('Decoded token during login:', decodedToken);
+          
+          // Store the user role - might be under different property names
+          if (decodedToken.role) {
+            console.log(`Found role in token: ${decodedToken.role}`);
+            localStorage.setItem('userRole', decodedToken.role);
+          } else if (decodedToken.userRole) {
+            console.log(`Found userRole in token: ${decodedToken.userRole}`);
+            localStorage.setItem('userRole', decodedToken.userRole);
+          } else if (response.data.data.user && response.data.data.user.role) {
+            console.log(`Found role in response: ${response.data.data.user.role}`);
+            localStorage.setItem('userRole', response.data.data.user.role);          } else {
+            console.log('No role found in token or response');
+          }
+          
+          // Check if user is a recruiter and redirect accordingly
+          const userRole = localStorage.getItem('userRole');
+          if (userRole === 'recruiter') {
+            console.log('User logged in as a recruiter, redirecting to employer page');
+            window.location.href = "employer.html";
+            return;
+          }
+        } catch (e) {
+          console.error('Error decoding token:', e);
+        }
+        
         window.location.href = "index.html";
       } catch (err) {
         let msg = "Sign in failed";
@@ -168,14 +247,32 @@ function renderAuthForm(type) {
       const email = this.querySelector('input[placeholder="Email"]').value;
       const password = this.querySelector('input[placeholder="Password"]').value;
       const role = this.querySelector('input[name="role"]:checked')?.value;
-      const payload = { name, email, password, role };
-      try {
+      const payload = { name, email, password, role };      try {
         const response = await axios.post(
           'https://web-backend-7aux.onrender.com/api/v1/auth/sign-up',
           JSON.stringify(payload),
           { headers: { 'Content-Type': 'application/json' } }
         );
-        window.location.href = "index.html";
+        
+        console.log('Sign-up response:', response.data);
+        
+        // Store the selected role directly in localStorage
+        if (role) {
+          console.log(`Storing selected role from signup: ${role}`);
+          localStorage.setItem('userRole', role);
+        }
+          // If the API returns a token, save it
+        if (response.data.data && response.data.data.token) {
+          localStorage.setItem('token', response.data.data.token);
+        }
+        
+        // If user is a recruiter, redirect to employer page
+        if (role === 'recruiter') {
+          console.log('User signed up as a recruiter, redirecting to employer page');
+          window.location.href = "employer.html";
+        } else {
+          window.location.href = "index.html";
+        }
       } catch (err) {
         let msg = "Sign Up failed";
         if (err.response && err.response.data && err.response.data.message) {
@@ -198,6 +295,13 @@ function setupAuthModalButtons() {
       showAuthModal(this.textContent.trim().toLowerCase() === "sign up" ? "signup" : "login");
     });
   });
+  
+  // Hide employer nav item by default if user is not a recruiter
+  const userRole = localStorage.getItem('userRole');
+  const employerNavItem = document.querySelector('.nav-item a[href="employer.html"]')?.parentElement;
+  if (employerNavItem) {
+    employerNavItem.style.display = (userRole === 'recruiter') ? '' : 'none';
+  }
   
   // Check auth state on page load
   updateAuthButtonsVisibility();

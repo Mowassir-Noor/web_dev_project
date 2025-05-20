@@ -718,62 +718,100 @@ input:-webkit-autofill:focus {
   opacity: 0;
 }
 
-@media (max-width: 900px) {
-  .container { max-width: 97vw;}
-  .hero-gradient { padding-left: 0.5em; padding-right: 0.5em;}
-  .profile-container-modern {
-    border-radius: 18px;
-    padding: 1.2em 0.5em 1em 0.5em;
-  }
-  .profile-card-modern {
-    border-radius: 18px !important;
-  }
-  .profile-banner-modern {
-    height: 70px;
-  }
-  .profile-card-body-modern {
-    margin-top: -35px;
-    padding: 1em 0.5em 1em 0.5em !important;
-  }
-  .profile-avatar-modern {
-    width: 60px;
-    height: 60px;
-    font-size: 1.2rem;
-    border-width: 2px;
-  }
-  .profile-summary-box-modern {
-    font-size: 0.98em;
-    padding: 0.7em 0.7em;
-    border-radius: 12px;
-    max-width: 98vw;
-  }
+/* Employer Dashboard Styles */
+.employer-dashboard h2 {
+  color: #00ADB5;
+  margin-bottom: 1.5rem;
 }
 
-@media (max-width: 600px) {
-  .profile-container-modern {
-    border-radius: 10px;
-    padding: 0.7em 0.2em 0.7em 0.2em;
-  }
-  .profile-card-modern {
-    border-radius: 10px !important;
-  }
-  .profile-banner-modern {
-    height: 40px;
-  }
-  .profile-card-body-modern {
-    margin-top: -20px;
-    padding: 0.7em 0.2em 0.7em 0.2em !important;
-  }
-  .profile-avatar-modern {
-    width: 38px;
-    height: 38px;
-    font-size: 0.9rem;
-    border-width: 1.5px;
-  }
-  .profile-summary-box-modern {
-    font-size: 0.92em;
-    padding: 0.4em 0.3em;
-    border-radius: 7px;
-    max-width: 99vw;
-  }
+/* Improved table styling for job listings */
+.employer-dashboard .table {
+  margin-bottom: 0;
+}
+
+.employer-dashboard .table th {
+  border-top: none;
+  font-weight: 600;
+  color: #00ADB5;
+  background-color: rgba(34, 40, 49, 0.05);
+}
+
+.employer-dashboard .table td {
+  vertical-align: middle;
+}
+
+.employer-dashboard .table tr {
+  transition: background-color 0.3s ease;
+}
+
+.employer-dashboard .table tr:hover {
+  background-color: rgba(0, 173, 181, 0.05);
+}
+
+.employer-dashboard .table .badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+  border-radius: 50rem;
+}
+
+.employer-dashboard .card {
+  transition: all 0.3s ease;
+}
+
+.employer-dashboard .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+#job-form-container {
+  transition: all 0.3s ease;
+}
+
+#close-form-btn {
+  border-color: rgba(238, 238, 238, 0.5);
+  color: #EEEEEE;
+  font-size: 1.2rem;
+  padding: 0.25rem 0.75rem;
+  opacity: 0.8;
+}
+
+#close-form-btn:hover {
+  opacity: 1;
+  background-color: rgba(238, 238, 238, 0.1);
+}
+
+.table {
+  color: #EEEEEE;
+  background: rgba(57, 62, 70, 0.5);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: rgba(0, 173, 181, 0.2);
+  border-color: #393E46;
+  color: #00ADB5;
+  font-weight: 600;
+}
+
+.table tbody td {
+  border-color: #393E46;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(0, 173, 181, 0.1);
+}
+
+.badge.bg-secondary {
+  background-color: #393E46 !important;
+  color: #00ADB5;
+  font-weight: 500;
+  padding: 0.5em 0.75em;
+}
+
+#new-job-btn {
+  background-color: #00ADB5;
+  border-color: #00ADB5;
+  font-weight: 600;
 }

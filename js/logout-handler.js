@@ -5,10 +5,16 @@ document.addEventListener('DOMContentLoaded', function() {
   const logoutBtn = document.getElementById('logout-btn');
   
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      // Remove the token
+    logoutBtn.addEventListener('click', function(e) {      e.preventDefault();
+      // Remove the token and role
       localStorage.removeItem('token');
+      localStorage.removeItem('userRole');
+      
+      // Hide employer nav item when logging out
+      const employerNavItem = document.querySelector('.nav-item a[href="employer.html"]')?.parentElement;
+      if (employerNavItem) {
+        employerNavItem.style.display = 'none';
+      }
       
       // Update buttons visibility if on the same page
       const loginBtn = document.getElementById('login-btn');
