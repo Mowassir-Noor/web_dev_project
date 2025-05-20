@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>`;
     
-    // Card view for all screen sizes
+    // Card view with horizontal layout for desktop and vertical for mobile
     html += `<div class="row job-cards-container">`;
     
     // Process each job
@@ -597,61 +597,74 @@ document.addEventListener('DOMContentLoaded', () => {
         expiryDate;
       
       html += `
-        <div class="col-12 col-md-6 col-xl-4 mb-4">
-          <div class="card h-100 job-card ${isCurrentlyEditing ? 'editing' : ''}" 
+        <div class="col-12 mb-4">
+          <div class="card job-card ${isCurrentlyEditing ? 'editing' : ''}" 
               data-job-id="${job._id}" 
               data-posted-date="${job.createdAt || Date.now()}" 
               data-expiry="${job.expiresAt || ''}"
-              data-job-type="${job.jobType || ''}"
-            <div class="card-body d-flex flex-column">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <h5 class="card-title mb-1">${job.title}</h5>
-                <span class="badge bg-${getBadgeColor(job.jobType)}">${formattedJobType}</span>
-              </div>
-              <h6 class="card-subtitle mb-2 text-muted">${job.companyName}</h6>
-              
-              <div class="job-card-details">
-                <div class="mb-1">
-                  <small class="text-muted d-flex align-items-center">
-                    <i class="bi bi-geo-alt me-2"></i> ${job.location}
-                  </small>
-                </div>
-                ${job.category ? `
-                  <div class="mb-1">
-                    <small class="text-muted d-flex align-items-center">
-                      <i class="bi bi-folder me-2"></i> ${job.category}
-                    </small>
-                  </div>
-                ` : ''}
-                ${job.salaryRange ? `
-                  <div class="mb-1">
-                    <small class="text-muted d-flex align-items-center">
-                      <i class="bi bi-cash-stack me-2"></i> ${job.salaryRange}
-                    </small>
-                  </div>
-                ` : ''}
-                <div class="mb-3">
-                  <div class="d-flex flex-column flex-sm-row gap-2 small">
-                    <div>
-                      <i class="bi bi-calendar3 me-2"></i> Posted: ${postedDate}
+              data-job-type="${job.jobType || ''}">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-12 col-md-8">
+                  <div class="d-flex flex-column h-100">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <h5 class="card-title mb-1">${job.title}</h5>
+                      <span class="badge bg-${getBadgeColor(job.jobType)}">${formattedJobType}</span>
                     </div>
-                    <div>
-                      <i class="bi bi-calendar-x me-2"></i> Expires: ${expiryLabel}
+                    <h6 class="card-subtitle mb-3 text-muted">${job.companyName}</h6>
+                    
+                    <div class="job-card-details">
+                      <div class="row mb-3">
+                        <div class="col-12 col-md-4 mb-2 mb-md-0">
+                          <small class="text-muted d-flex align-items-center">
+                            <i class="bi bi-geo-alt me-2"></i> ${job.location}
+                          </small>
+                        </div>
+                        ${job.category ? `
+                        <div class="col-12 col-md-4 mb-2 mb-md-0">
+                          <small class="text-muted d-flex align-items-center">
+                            <i class="bi bi-folder me-2"></i> ${job.category}
+                          </small>
+                        </div>
+                        ` : ''}
+                        ${job.salaryRange ? `
+                        <div class="col-12 col-md-4 mb-2 mb-md-0">
+                          <small class="text-muted d-flex align-items-center">
+                            <i class="bi bi-cash-stack me-2"></i> ${job.salaryRange}
+                          </small>
+                        </div>
+                        ` : ''}
+                      </div>
+                      <div class="job-dates mb-3">
+                        <div class="d-flex flex-column flex-sm-row gap-3 small">
+                          <div>
+                            <i class="bi bi-calendar3 me-2"></i> Posted: ${postedDate}
+                          </div>
+                          <div>
+                            <i class="bi bi-calendar-x me-2"></i> Expires: ${expiryLabel}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="job-description mb-3">
+                        <p class="text-truncate-3 mb-0">${job.description ? job.description.substring(0, 250) + '...' : 'No description provided.'}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              <div class="d-flex justify-content-end mt-auto">
-                <a href="job-details.html?id=${job._id}" class="btn btn-outline-primary me-2">
-                  <i class="bi bi-eye me-1"></i> <span class="d-none d-sm-inline">View</span>
-                </a>
-                <button class="btn btn-outline-secondary me-2" onclick="editJob('${job._id}')">
-                  <i class="bi bi-pencil me-1"></i> <span class="d-none d-sm-inline">Edit</span>
-                </button>
-                <button class="btn btn-outline-danger" onclick="deleteJob('${job._id}')">
-                  <i class="bi bi-trash me-1"></i> <span class="d-none d-sm-inline">Delete</span>
-                </button>
+                
+                <div class="col-12 col-md-4 d-flex flex-column justify-content-center">
+                  <div class="action-buttons-container d-flex flex-row flex-md-column gap-2 justify-content-end">
+                    <a href="job-details.html?id=${job._id}" class="btn btn-outline-primary">
+                      <i class="bi bi-eye me-1"></i> <span>View Details</span>
+                    </a>
+                    <button class="btn btn-outline-secondary" onclick="editJob('${job._id}')">
+                      <i class="bi bi-pencil me-1"></i> <span>Edit Job</span>
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="deleteJob('${job._id}')">
+                      <i class="bi bi-trash me-1"></i> <span>Delete Job</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -715,7 +728,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const title = card.querySelector('.card-title')?.textContent?.toLowerCase() || '';
         const company = card.querySelector('.card-subtitle')?.textContent?.toLowerCase() || '';
         const location = card.querySelector('.bi-geo-alt')?.parentElement?.textContent?.toLowerCase() || '';
-        return title.includes(searchTerm) || company.includes(searchTerm) || location.includes(searchTerm);
+        const description = card.querySelector('.job-description')?.textContent?.toLowerCase() || '';
+        return title.includes(searchTerm) || company.includes(searchTerm) || 
+               location.includes(searchTerm) || description.includes(searchTerm);
       });
     }
     
@@ -749,7 +764,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Update the display
-    const cols = document.querySelectorAll('.job-cards-container .col-12.col-md-6.col-xl-4');
+    const cols = document.querySelectorAll('.job-cards-container .col-12');
     
     // If no cards are found
     if (filteredCards.length === 0) {
@@ -774,7 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Show only filtered cards
     filteredCards.forEach(card => {
-      const parentCol = card.closest('.col-12.col-md-6.col-xl-4');
+      const parentCol = card.closest('.col-12');
       if (parentCol) {
         parentCol.style.display = 'block';
       }
@@ -792,7 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sortSelect) sortSelect.value = 'newest';
     
     // Reset all cards
-    const cols = document.querySelectorAll('.job-cards-container .col-12.col-md-6.col-xl-4');
+    const cols = document.querySelectorAll('.job-cards-container .col-12');
     cols.forEach(col => {
       col.style.display = 'block';
     });
