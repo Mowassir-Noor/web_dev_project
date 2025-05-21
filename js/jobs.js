@@ -7,12 +7,23 @@ function fetchJobs() {
   // Show loading indicator
   $('#jobs-list').html('<div class="d-flex justify-content-center my-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
   
+  // Check if we have URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const hasSearchParams = urlParams.has('q') || urlParams.has('l') || urlParams.has('type');
+  
   // Make API request
   axios.get('https://web-backend-7aux.onrender.com/api/v1/jobs')
     .then(response => {
       if (response.data && response.data.success) {
         jobsData = response.data.data;
-        renderJobs(jobsData);
+        
+        // If we have search parameters, apply filters directly
+        // Otherwise just render all jobs
+        if (hasSearchParams) {
+          applyFilters();
+        } else {
+          renderJobs(jobsData);
+        }
       } else {
         $('#jobs-list').html('<div class="alert alert-danger">Failed to load jobs data.</div>');
       }
@@ -70,18 +81,118 @@ function applyFilters() {
   const type = $('#type').val();
   const search = $('#search-input').val().toLowerCase();
   
-  let filtered = jobsData.filter(job =>
-    (location ? job.location.toLowerCase().includes(location) : true) &&
-    (type ? job.jobType === type : true) &&
-    (search ? job.title.toLowerCase().includes(search) || job.companyName.toLowerCase().includes(search) : true)
-  );
+  // If we have search parameters, we'll filter the jobs more extensively
+  let filtered = jobsData.filter(job => {
+    // Location filter
+    const locationMatch = location ? job.location.toLowerCase().includes(location) : true;
+    
+    // Job type filter
+    const typeMatch = type ? job.jobType === type : true;
+    
+    // Search filter - check title, company name, and description
+    const searchMatch = search ? (
+      job.title.toLowerCase().includes(search) || 
+      job.companyName.toLowerCase().includes(search) || 
+      job.description.toLowerCase().includes(search)
+    ) : true;
+    
+    // Job must match all applied filters
+    return locationMatch && typeMatch && searchMatch;
+  });
   
+  // Update UI with filtered jobs
   renderJobs(filtered);
+  
+  // Update URL with filter parameters (optional - enables sharing filtered results)
+  updateUrlParams(search, location, type);
+}
+
+// Helper function to update the URL with current search parameters
+function updateUrlParams(search, location, jobType) {
+  const url = new URL(window.location.href);
+  const params = url.searchParams;
+  
+  // Update or remove parameters based on filter values
+  if (search) {
+    params.set('q', search);
+  } else {
+    params.delete('q');
+  }
+  
+  if (location) {
+    params.set('l', location);
+  } else {
+    params.delete('l');
+  }
+  
+  if (jobType) {
+    params.set('type', jobType);
+  } else {
+    params.delete('type');
+  }
+  
+  // Replace the current URL without reloading the page
+  window.history.replaceState({}, '', url.toString());
 }
 
 $(document).ready(function () {
   // Fetch jobs from API when page loads
   fetchJobs();
+  
+  // Check URL parameters for search query and location
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchQuery = urlParams.get('q');
+  const searchLocation = urlParams.get('l');
+  const jobType = urlParams.get('type');
+  const autoFilter = urlParams.get('autofilter');
+  
+  // Apply search parameters from URL if present
+  if (searchQuery || searchLocation || jobType || autoFilter === 'true') {
+    // Set form values based on URL parameters
+    if (searchQuery) {
+      $('#search-input').val(searchQuery);
+    }
+    if (searchLocation) {
+      $('#location').val(searchLocation);
+    }
+    if (jobType) {
+      $('#type').val(jobType);
+    }
+    
+    console.log('Search parameters detected. Preparing to apply filters...');
+    
+    // Force application of filters once data is loaded
+    const applyFiltersWhenReady = () => {
+      console.log('Checking if job data is loaded...');
+      if (jobsData && jobsData.length > 0) {
+        console.log('Job data loaded. Applying filters now.');
+        applyFilters();
+        return true;
+      }
+      return false;
+    };
+    
+    // Try to apply filters immediately if data is already loaded
+    if (!applyFiltersWhenReady()) {
+      console.log('Job data not loaded yet. Setting up interval to check...');
+      // Set up an interval to check for data and apply filters once available
+      const filterInterval = setInterval(() => {
+        if (applyFiltersWhenReady()) {
+          clearInterval(filterInterval);
+        }
+      }, 200);
+      
+      // Set a timeout to clear the interval if it takes too long
+      setTimeout(() => {
+        console.log('Filter application timeout reached.');
+        clearInterval(filterInterval);
+        // One final attempt
+        if (jobsData && jobsData.length > 0) {
+          applyFilters();
+        }
+      }, 5000);
+    }
+  }
   
   // Set up filter handlers
   $('#filter-form').on('submit', function(e) {
