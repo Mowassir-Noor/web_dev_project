@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build --outDir dist",
     "lint": "bunx biome lint --write && bunx tsc --noEmit",
     "format": "bunx biome format --write",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "serve -s dist"
+
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
