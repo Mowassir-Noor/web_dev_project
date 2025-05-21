@@ -188,6 +188,17 @@ function renderAuthForm(type) {
             localStorage.setItem('userRole', response.data.data.user.role);          } else {
             console.log('No role found in token or response');
           }
+
+          // store the user ID if available
+          if (decodedToken.userId) {
+            console.log(`Found userId in token: ${decodedToken.userId}`);
+            localStorage.setItem('userId', decodedToken.userId);
+          } else if (response.data.data.user && response.data.data.user._id) {
+            console.log(`Found userId in response: ${response.data.data.user._id}`);
+            localStorage.setItem('userId', response.data.data.user._id);
+          } else {
+            console.log('No userId found in token or response');
+          }
           
           // Check if user is a recruiter and redirect accordingly
           const userRole = localStorage.getItem('userRole');
